@@ -122,3 +122,5 @@ dialog .close { position: absolute; top: 8px; right: 8px; padding: 4px 12px; bor
   .shot.wide { grid-column: auto; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+.feature { border-left: 3px solid var(--brand); }
+.feature p { color: var(--fg2); max-width: 90ch; }
