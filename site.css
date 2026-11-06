@@ -135,3 +135,25 @@ dialog .close { position: absolute; top: 8px; right: 8px; padding: 4px 12px; bor
 @media (max-width: 640px) { .steps, .steps.seven { grid-template-columns: 1fr; } }
 .diff { background: var(--brand-bg2); box-shadow: none; }
 .diff p { color: var(--fg2); font-size: 15px; line-height: 22px; margin: 0; }
+
+/* jump nav */
+.jump { display: flex; flex-wrap: wrap; gap: 8px; padding: 24px 0 0; }
+.jump a { padding: 6px 14px; border-radius: 999px; background: var(--bg1); box-shadow: var(--shadow2, 0 0 2px var(--sh-a), 0 1px 2px var(--sh-k)); color: var(--fg1); font: 600 14px/20px var(--font); text-decoration: none; }
+.jump a:hover { background: var(--brand-bg2); color: var(--brand-fg); }
+section[id] { scroll-margin-top: 64px; }
+html { scroll-behavior: smooth; }
+
+/* expandable deep dives */
+.dd-list { display: grid; gap: 8px; }
+.dd { background: var(--bg1); border-radius: var(--r-xl); box-shadow: var(--shadow4); overflow: hidden; }
+.dd > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr auto; grid-template-areas: "t c" "s c"; column-gap: 16px; padding: 18px 24px; }
+.dd > summary::-webkit-details-marker { display: none; }
+.dd > summary::after { content: ""; grid-area: c; align-self: center; width: 10px; height: 10px; border-right: 2px solid var(--fg3); border-bottom: 2px solid var(--fg3); transform: rotate(45deg); transition: transform .2s; margin-right: 4px; }
+.dd[open] > summary::after { transform: rotate(-135deg); }
+.dd > summary:hover { background: var(--bg3); }
+.dd > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.dd-t { grid-area: t; font: 600 20px/28px var(--display); }
+.dd-s { grid-area: s; color: var(--fg3); font-size: 14px; line-height: 20px; margin-top: 2px; }
+.dd-body { padding: 4px 24px 24px; border-top: 1px solid var(--stroke2); background: var(--bg2); }
+.dd-body > :first-child { margin-top: 20px; }
+.dd-body .card, .dd-body .timeline li, .dd-body .steps li { box-shadow: var(--shadow2, 0 0 2px var(--sh-a), 0 1px 2px var(--sh-k)); }

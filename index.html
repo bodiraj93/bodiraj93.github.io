@@ -41,12 +41,16 @@
   </ul>
 </section>
 
+<nav class="jump wrap" aria-label="On this page">
+  <a href="#what">What it does</a><a href="#screens">Screens</a><a href="#results">Results</a><a href="#built">How it's built</a><a href="#role">My role</a>
+</nav>
+
 <section class="wrap block">
   <h2>The problem</h2>
   <p>Quality MCAT preparation costs thousands of dollars, and that cost shouldn't decide who gets into medicine. Students trust the official AAMC questions but find the explanations thin. UWorld explains well, but many students can't afford it. This app offers both, at no cost.</p>
 </section>
 
-<section class="wrap block">
+<section class="wrap block" id="what">
   <h2>What it does</h2>
   <div class="grid three">
     <article class="card pad"><h3>Plans every day</h3><p>Builds a day-by-day schedule from the exam date and the time available, with catch-up and rest days. Anki schedules cards. This plans the whole day: reviews, reading, questions and practice exams.</p></article>
@@ -63,92 +67,8 @@
   <div class="gallery" data-gallery></div>
 </section>
 
-<section class="wrap block">
-  <h2>How it grew</h2>
-  <ol class="timeline">
-    <li><span class="when">Mar to Jun</span><h3>Flashcard tool</h3><p>A personal flashcard app, extended with practice exams, a planner and statistics.</p></li>
-    <li><span class="when">Jun to Aug</span><h3>Full rebuild</h3><p>Rebuilt on a modern framework, with every existing feature listed first so none were lost.</p></li>
-    <li><span class="when">September</span><h3>Design and data</h3><p>Every screen redesigned. Textbook library, encrypted storage and Anki import added.</p></li>
-    <li><span class="when">October</span><h3>Question generator</h3><p>Generator built and tested blind against official and commercial questions. Phone companion added.</p></li>
-    <li><span class="when">November</span><h3>Question bank</h3><p>Completing the full bank ahead of launch to pre-med students at the University of Manitoba.</p></li>
-  </ol>
-</section>
-
-<section class="wrap block">
-  <h2>Product decisions</h2>
-  <div class="grid two">
-    <article class="card pad"><h3>Cut a feature that looked great</h3><p>We built a 3D world for the home screen. It was impressive, but it slowed the app and pulled focus from studying, so I removed it.</p></article>
-    <article class="card pad"><h3>Every fact is sourced</h3><p>Every question and card must trace back to a textbook section. Anything that can't is discarded.</p></article>
-    <article class="card pad"><h3>Nothing ships unchecked</h3><p>Every change is tested and approved by a separate reviewer before it is merged.</p></article>
-    <article class="card pad"><h3>Privacy first</h3><p>No account and no cloud storage. AI features are optional and use the student's own key.</p></article>
-  </div>
-</section>
-
-<section class="wrap block">
-  <h2>Engineering decisions</h2>
-  <article class="card pad feature">
-    <h3>Local only, and encrypted</h3>
-    <p>Most apps today are cloud subscriptions that keep your data on their servers. I chose the opposite. Students' study records sit close to health and medical information, and that kind of data should not be sent over the internet without their say. Everything stays on the student's own computer, in an encrypted database (SQLCipher). There is no account and no cloud storage, and the app works fully offline. AI features are optional and use the student's own key, so nothing is shared unless they choose it.</p>
-  </article>
-  <div class="grid three after">
-    <article class="card pad"><h3>Migration to React</h3><p>The original app had grown to about 30,000 lines of plain JavaScript and was getting risky to change. I moved it to React, starting from a full feature inventory so nothing was lost, and old code was retired only after a script proved nothing still used it.</p></article>
-    <article class="card pad"><h3>Single owners</h3><p>Every rule lives in exactly one place. One module decides what is due for review, and the home screen, study sessions, flashcards and planner all read from it. When two screens work something out separately, they eventually disagree. One owner means one answer and one place to fix.</p></article>
-    <article class="card pad"><h3>Headless logic</h3><p>Scheduling, pacing and planning are pure functions with no screen, clock or storage inside them. They can be tested thoroughly on their own and behave the same wherever they are used.</p></article>
-    <article class="card pad"><h3>Clear state management</h3><p>State is split into four layers: shared logic, encrypted study data, settings and background services. Each screen's state has exactly one owner in the store (Zustand), so any bug traces back to one place.</p></article>
-    <article class="card pad"><h3>A plan that can't go stale</h3><p>A saved study plan is out of date the moment a student misses a day. So the plan is never stored. It is recalculated from the student's real progress every time, and every change they make is applied the same way.</p></article>
-    <article class="card pad"><h3>Locked-down desktop shell</h3><p>Even a local app should limit what can go wrong. The Electron shell runs sandboxed, the interface reaches the system only through an approved list of channels, and every response is checked at that boundary.</p></article>
-  </div>
-</section>
-
-<section class="wrap block">
-  <h2>The AI router</h2>
-  <p class="intro">The app can work with six AI providers: Anthropic, OpenAI, Google Gemini, Mistral, Groq and Ollama, which runs models on the student's own computer. A router decides which model handles each task. I designed it around one principle: the student's choices always come first, and quality, capability and cost are weighed only within them.</p>
-  <ol class="steps">
-    <li><h3>The student's choices</h3><p>A model the student has pinned is used as is. Otherwise the router stays within their chosen provider, their quality setting and their spending limit.</p></li>
-    <li><h3>What the task needs</h3><p>Each task declares what it requires, such as reading images, reading PDFs, structured output, long documents or keeping data on the computer. Models that can't do the job are filtered out.</p></li>
-    <li><h3>Best fit, then cost</h3><p>Among the models left, it scores quality for that kind of work and moves up a tier only for harder material, such as difficult questions or answers that must be graded precisely.</p></li>
-    <li><h3>Clear when it falls short</h3><p>If no available model meets every requirement, it uses the closest match and tells the student plainly, including what would fix it. It never fails silently.</p></li>
-  </ol>
-  <p class="note">The routing decision is a pure function: the same inputs always give the same answer, with no side effects, so every rule can be tested directly. Adding a new provider means registering it, not changing the router.</p>
-  <div class="grid two after">
-    <article class="card pad diff"><h3>How it differs</h3><p>Most study apps are tied to one cloud AI service and send everything to it. This router works across six providers, including one that runs entirely on the student's computer, and it puts the student's choices and data rules ahead of the system's preferences.</p></article>
-    <article class="card pad diff"><h3>How it was proved</h3><p>Because each decision is a pure function, every rule (pins, capability filters, tier escalation, spending limits, the loud fallback) is checked directly by automated tests, without needing a live AI service.</p></article>
-  </div>
-</section>
-
-<section class="wrap block">
-  <h2>The question generator</h2>
-  <p class="intro">Generated questions are only useful if they are right. The generator is a pipeline of seven stages, using several AI models and code checks, each with one job. Four of the stages can reject a question, and anything that fails is discarded rather than patched.</p>
-  <ol class="steps seven">
-    <li><h3>Source first</h3><p>Every question starts from one section of a real text: OpenStax for the sciences, published works for reading passages.</p></li>
-    <li><h3>Blueprint</h3><p>The question is planned before it is written: the skill it tests, the reasoning it needs, and the specific mistake each wrong answer is built to catch.</p></li>
-    <li><h3>Write</h3><p>Passage, question, four options and a step-by-step explanation, written only from the source and the blueprint.</p></li>
-    <li class="gate"><h3>Blind solve</h3><p>A separate model answers without seeing the key. If it doesn't reach the intended answer, the question is out.</p></li>
-    <li class="gate"><h3>Grounding check</h3><p>Every fact the answer depends on must be found in the source text. Anything unsupported is out.</p></li>
-    <li class="gate"><h3>Rules in code</h3><p>Fixed checks no model can argue past: format, option letters, explanation steps, giveaway wording and duplicates.</p></li>
-    <li class="gate"><h3>Measured against the exam</h3><p>Each batch's mix of skills and difficulty must sit within the real exam's range, and batches are rated blind alongside real exam questions.</p></li>
-  </ol>
-  <div class="grid two after">
-    <article class="card pad diff"><h3>How it differs</h3><p>I benchmarked the design against 13 published and commercial systems. Research generators rely on templates built by experts or a human reviewer at the end, and commercial banks don't publish how their questions are made. A single AI prompt produces acceptable questions only 18 to 31 percent of the time in a published medical study. This pipeline has no human in the loop, so its gates are built to carry that load: every wrong answer is planned around a real mistake, and every fact is checked against the source.</p></article>
-    <article class="card pad diff"><h3>How it was proved</h3><p>Batches were rated blind, mixed in with official AAMC and commercial questions. On biology and biochemistry, its explanations scored 4.87 out of 5, against 4.10 for UWorld and 3.08 for the AAMC's own. Each round of testing fed the next version of the pipeline.</p></article>
-  </div>
-</section>
-
-<section class="wrap block">
-  <h2>How it's tested</h2>
-  <div class="grid three">
-    <article class="card pad"><h3>Simulated students</h3><p>Simulated students study for a week, a month, a year and several years, on the real encrypted database. They miss days, move their exam date, import decks and rest, and the app is checked every simulated day. One run loads 100,000 cards to test scale.</p></article>
-    <article class="card pad"><h3>The real app, day by day</h3><p>Automated tests open the real desktop app and study through it for weeks at a time with a controlled clock, then compare the app's plan against an independent calculation every day.</p></article>
-    <article class="card pad"><h3>Rules about the plan</h3><p>Property tests state rules the planner must always keep, then check them across many randomly generated study histories with missed days, rest days and exam date changes.</p></article>
-    <article class="card pad"><h3>Proof, not promises</h3><p>A task can only be marked done with a signed record that its tests ran. The system re-runs that command itself, and blocks any commit made with code newer than the last passing test run.</p></article>
-    <article class="card pad"><h3>Wording rules, enforced</h3><p>The app's writing rules are checked automatically by the test suite: plain everyday words, no internal jargon, no dashes or trailing dots. A screen that breaks them fails the tests.</p></article>
-    <article class="card pad"><h3>Credit where it's due</h3><p>Every textbook figure carries its source and licence on the card. A licence audit corrected the terms shown across the app.</p></article>
-  </div>
-</section>
-
-<section class="wrap block">
+<section class="wrap block" id="results">
   <h2>Results</h2>
-  <p class="intro">Every major part was iterated and re-tested until it measured up. The flashcard generator is a good example: the previous version's cards were thin, so it was rebuilt and tested again, blind.</p>
   <div class="grid two">
     <article class="card pad">
       <h3>Questions, scored blind</h3>
@@ -179,6 +99,129 @@
   </div>
   <div class="grid two after">
     <article class="card pad">
+      <h3>Compared with current options</h3>
+      <table class="scores compare">
+        <thead><tr><th scope="col"></th><th scope="col">Price</th><th scope="col">What students say</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">AAMC</th><td>about $324</td><td>Most like the exam. Thin explanations.</td></tr>
+          <tr><th scope="row">UWorld</th><td>from $339</td><td>Great explanations. Expensive.</td></tr>
+          <tr><th scope="row">Blueprint</th><td>$1,499+</td><td>Structured. Lots of video.</td></tr>
+          <tr><th scope="row">Anki decks</th><td>Free</td><td>Huge, but with gaps and errors.</td></tr>
+          <tr><th scope="row">This app</th><td>Free</td><td>Exam-format questions, detailed explanations and a daily plan.</td></tr>
+        </tbody>
+      </table>
+    </article>
+    <article class="card pad">
+      <h3>Reliability</h3>
+      <ul class="plain">
+        <li>Over 2,100 automated test files, including end-to-end tests that drive the real app.</li>
+        <li>Every change is tested and reviewed before it is merged.</li>
+        <li>Every question and card traces back to its textbook section.</li>
+        <li>Imports Anki decks of over 6,000 notes in under 30 seconds.</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<section class="wrap block" id="built">
+  <h2>How it's built</h2>
+  <p class="sub">Select a topic to expand it.</p>
+  <div class="dd-list">
+  <details class="dd">
+    <summary><span class="dd-t">How it grew</span><span class="dd-s">From a personal flashcard tool to a full study platform, March to November 2026.</span></summary>
+    <div class="dd-body">
+<ol class="timeline">
+    <li><span class="when">Mar to Jun</span><h3>Flashcard tool</h3><p>A personal flashcard app, extended with practice exams, a planner and statistics.</p></li>
+    <li><span class="when">Jun to Aug</span><h3>Full rebuild</h3><p>Rebuilt on a modern framework, with every existing feature listed first so none were lost.</p></li>
+    <li><span class="when">September</span><h3>Design and data</h3><p>Every screen redesigned. Textbook library, encrypted storage and Anki import added.</p></li>
+    <li><span class="when">October</span><h3>Question generator</h3><p>Generator built and tested blind against official and commercial questions. Phone companion added.</p></li>
+    <li><span class="when">November</span><h3>Question bank</h3><p>Completing the full bank ahead of launch to pre-med students at the University of Manitoba.</p></li>
+  </ol>
+    </div>
+  </details>
+  <details class="dd">
+    <summary><span class="dd-t">Product decisions</span><span class="dd-s">What was cut, what was required, and why.</span></summary>
+    <div class="dd-body">
+<div class="grid two">
+    <article class="card pad"><h3>Cut a feature that looked great</h3><p>We built a 3D world for the home screen. It was impressive, but it slowed the app and pulled focus from studying, so I removed it.</p></article>
+    <article class="card pad"><h3>Every fact is sourced</h3><p>Every question and card must trace back to a textbook section. Anything that can't is discarded.</p></article>
+    <article class="card pad"><h3>Nothing ships unchecked</h3><p>Every change is tested and approved by a separate reviewer before it is merged.</p></article>
+    <article class="card pad"><h3>Privacy first</h3><p>No account and no cloud storage. AI features are optional and use the student's own key.</p></article>
+  </div>
+    </div>
+  </details>
+  <details class="dd">
+    <summary><span class="dd-t">Engineering decisions</span><span class="dd-s">Local and encrypted storage, the React migration, single owners, headless logic and state.</span></summary>
+    <div class="dd-body">
+<article class="card pad feature">
+    <h3>Local only, and encrypted</h3>
+    <p>Most apps today are cloud subscriptions that keep your data on their servers. I chose the opposite. Students' study records sit close to health and medical information, and that kind of data should not be sent over the internet without their say. Everything stays on the student's own computer, in an encrypted database (SQLCipher). There is no account and no cloud storage, and the app works fully offline. AI features are optional and use the student's own key, so nothing is shared unless they choose it.</p>
+  </article>
+  <div class="grid three after">
+    <article class="card pad"><h3>Migration to React</h3><p>The original app had grown to about 30,000 lines of plain JavaScript and was getting risky to change. I moved it to React, starting from a full feature inventory so nothing was lost, and old code was retired only after a script proved nothing still used it.</p></article>
+    <article class="card pad"><h3>Single owners</h3><p>Every rule lives in exactly one place. One module decides what is due for review, and the home screen, study sessions, flashcards and planner all read from it. When two screens work something out separately, they eventually disagree. One owner means one answer and one place to fix.</p></article>
+    <article class="card pad"><h3>Headless logic</h3><p>Scheduling, pacing and planning are pure functions with no screen, clock or storage inside them. They can be tested thoroughly on their own and behave the same wherever they are used.</p></article>
+    <article class="card pad"><h3>Clear state management</h3><p>State is split into four layers: shared logic, encrypted study data, settings and background services. Each screen's state has exactly one owner in the store (Zustand), so any bug traces back to one place.</p></article>
+    <article class="card pad"><h3>A plan that can't go stale</h3><p>A saved study plan is out of date the moment a student misses a day. So the plan is never stored. It is recalculated from the student's real progress every time, and every change they make is applied the same way.</p></article>
+    <article class="card pad"><h3>Locked-down desktop shell</h3><p>Even a local app should limit what can go wrong. The Electron shell runs sandboxed, the interface reaches the system only through an approved list of channels, and every response is checked at that boundary.</p></article>
+  </div>
+    </div>
+  </details>
+  <details class="dd">
+    <summary><span class="dd-t">The AI router</span><span class="dd-s">Six providers, the student's choices first, and no silent failures.</span></summary>
+    <div class="dd-body">
+<p class="intro">The app can work with six AI providers: Anthropic, OpenAI, Google Gemini, Mistral, Groq and Ollama, which runs models on the student's own computer. A router decides which model handles each task. I designed it around one principle: the student's choices always come first, and quality, capability and cost are weighed only within them.</p>
+  <ol class="steps">
+    <li><h3>The student's choices</h3><p>A model the student has pinned is used as is. Otherwise the router stays within their chosen provider, their quality setting and their spending limit.</p></li>
+    <li><h3>What the task needs</h3><p>Each task declares what it requires, such as reading images, reading PDFs, structured output, long documents or keeping data on the computer. Models that can't do the job are filtered out.</p></li>
+    <li><h3>Best fit, then cost</h3><p>Among the models left, it scores quality for that kind of work and moves up a tier only for harder material, such as difficult questions or answers that must be graded precisely.</p></li>
+    <li><h3>Clear when it falls short</h3><p>If no available model meets every requirement, it uses the closest match and tells the student plainly, including what would fix it. It never fails silently.</p></li>
+  </ol>
+  <p class="note">The routing decision is a pure function: the same inputs always give the same answer, with no side effects, so every rule can be tested directly. Adding a new provider means registering it, not changing the router.</p>
+  <div class="grid two after">
+    <article class="card pad diff"><h3>How it differs</h3><p>Most study apps are tied to one cloud AI service and send everything to it. This router works across six providers, including one that runs entirely on the student's computer, and it puts the student's choices and data rules ahead of the system's preferences.</p></article>
+    <article class="card pad diff"><h3>How it was proved</h3><p>Because each decision is a pure function, every rule (pins, capability filters, tier escalation, spending limits, the loud fallback) is checked directly by automated tests, without needing a live AI service.</p></article>
+  </div>
+    </div>
+  </details>
+  <details class="dd">
+    <summary><span class="dd-t">The question generator</span><span class="dd-s">Seven stages, four rejection gates, benchmarked against 13 published and commercial systems.</span></summary>
+    <div class="dd-body">
+<p class="intro">Generated questions are only useful if they are right. The generator is a pipeline of seven stages, using several AI models and code checks, each with one job. Four of the stages can reject a question, and anything that fails is discarded rather than patched.</p>
+  <ol class="steps seven">
+    <li><h3>Source first</h3><p>Every question starts from one section of a real text: OpenStax for the sciences, published works for reading passages.</p></li>
+    <li><h3>Blueprint</h3><p>The question is planned before it is written: the skill it tests, the reasoning it needs, and the specific mistake each wrong answer is built to catch.</p></li>
+    <li><h3>Write</h3><p>Passage, question, four options and a step-by-step explanation, written only from the source and the blueprint.</p></li>
+    <li class="gate"><h3>Blind solve</h3><p>A separate model answers without seeing the key. If it doesn't reach the intended answer, the question is out.</p></li>
+    <li class="gate"><h3>Grounding check</h3><p>Every fact the answer depends on must be found in the source text. Anything unsupported is out.</p></li>
+    <li class="gate"><h3>Rules in code</h3><p>Fixed checks no model can argue past: format, option letters, explanation steps, giveaway wording and duplicates.</p></li>
+    <li class="gate"><h3>Measured against the exam</h3><p>Each batch's mix of skills and difficulty must sit within the real exam's range, and batches are rated blind alongside real exam questions.</p></li>
+  </ol>
+  <div class="grid two after">
+    <article class="card pad diff"><h3>How it differs</h3><p>I benchmarked the design against 13 published and commercial systems. Research generators rely on templates built by experts or a human reviewer at the end, and commercial banks don't publish how their questions are made. A single AI prompt produces acceptable questions only 18 to 31 percent of the time in a published medical study. This pipeline has no human in the loop, so its gates are built to carry that load: every wrong answer is planned around a real mistake, and every fact is checked against the source.</p></article>
+    <article class="card pad diff"><h3>How it was proved</h3><p>Batches were rated blind, mixed in with official AAMC and commercial questions. On biology and biochemistry, its explanations scored 4.87 out of 5, against 4.10 for UWorld and 3.08 for the AAMC's own. Each round of testing fed the next version of the pipeline.</p></article>
+  </div>
+    </div>
+  </details>
+  <details class="dd">
+    <summary><span class="dd-t">How it's tested</span><span class="dd-s">Simulated students, the real app driven day by day, and signed proof that tests ran.</span></summary>
+    <div class="dd-body">
+<div class="grid three">
+    <article class="card pad"><h3>Simulated students</h3><p>Simulated students study for a week, a month, a year and several years, on the real encrypted database. They miss days, move their exam date, import decks and rest, and the app is checked every simulated day. One run loads 100,000 cards to test scale.</p></article>
+    <article class="card pad"><h3>The real app, day by day</h3><p>Automated tests open the real desktop app and study through it for weeks at a time with a controlled clock, then compare the app's plan against an independent calculation every day.</p></article>
+    <article class="card pad"><h3>Rules about the plan</h3><p>Property tests state rules the planner must always keep, then check them across many randomly generated study histories with missed days, rest days and exam date changes.</p></article>
+    <article class="card pad"><h3>Proof, not promises</h3><p>A task can only be marked done with a signed record that its tests ran. The system re-runs that command itself, and blocks any commit made with code newer than the last passing test run.</p></article>
+    <article class="card pad"><h3>Wording rules, enforced</h3><p>The app's writing rules are checked automatically by the test suite: plain everyday words, no internal jargon, no dashes or trailing dots. A screen that breaks them fails the tests.</p></article>
+    <article class="card pad"><h3>Credit where it's due</h3><p>Every textbook figure carries its source and licence on the card. A licence audit corrected the terms shown across the app.</p></article>
+  </div>
+    </div>
+  </details>
+  <details class="dd">
+    <summary><span class="dd-t">Iteration in practice</span><span class="dd-s">The flashcard generator before and after, and how the plan was proved over months.</span></summary>
+    <div class="dd-body">
+<p class="intro">Every major part was iterated and re-tested until it measured up. The flashcard generator is a good example: the previous version's cards were thin, so it was rebuilt and tested again, blind.</p>
+<div class="grid two">
+    <article class="card pad">
       <h3>Flashcard generator, previous version against current</h3>
       <p class="sub">Same blind test, same raters, same six topics.</p>
       <table class="scores">
@@ -200,33 +243,12 @@
       </ul>
     </article>
   </div>
-  <div class="grid two after">
-    <article class="card pad">
-      <h3>Reliability</h3>
-      <ul class="plain">
-        <li>Over 2,100 automated test files, including end-to-end tests that drive the real app.</li>
-        <li>Every change is tested and reviewed before it is merged.</li>
-        <li>Every question and card traces back to its textbook section.</li>
-        <li>Imports Anki decks of over 6,000 notes in under 30 seconds.</li>
-      </ul>
-    </article>
-    <article class="card pad">
-      <h3>Compared with current options</h3>
-      <table class="scores compare">
-        <thead><tr><th scope="col"></th><th scope="col">Price</th><th scope="col">What students say</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">AAMC</th><td>about $324</td><td>Most like the exam. Thin explanations.</td></tr>
-          <tr><th scope="row">UWorld</th><td>from $339</td><td>Great explanations. Expensive.</td></tr>
-          <tr><th scope="row">Blueprint</th><td>$1,499+</td><td>Structured. Lots of video.</td></tr>
-          <tr><th scope="row">Anki decks</th><td>Free</td><td>Huge, but with gaps and errors.</td></tr>
-          <tr><th scope="row">This app</th><td>Free</td><td>Exam-format questions, detailed explanations and a daily plan.</td></tr>
-        </tbody>
-      </table>
-    </article>
+    </div>
+  </details>
   </div>
 </section>
 
-<section class="wrap block">
+<section class="wrap block" id="role">
   <h2>My role</h2>
   <div class="card pad role">
     <p>I lead the product. I define the requirements and quality standards, design the interface, and test every release. My biochemistry degree lets me verify the science content directly.</p>
