@@ -1,5 +1,5 @@
 window.SHOTS = [
- ['01-today','Today','The day's plan, with time estimates for each step.',true],
+ ['01-today','Today',"The day's plan, with time estimates for each step.",true],
  ['02-plan','Plan','Options to catch up after a missed day.'],
  ['10-progress','Progress','Topics that are starting to fade from memory.'],
  ['04-explanation','Explanation','Why the chosen answer is wrong, and why the correct one works.',true],
