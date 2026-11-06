@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bodi Raj | MCAT study app case study</title>
-<meta name="description" content="Case study: an MCAT study app I took from a simple flashcard tool to a full study platform, as product owner, designer and QA lead directing AI coding agents.">
+<title>Bodi Raj | MCAT study app</title>
+<meta name="description" content="A free MCAT study app I'm building. Demo, screens and results.">
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
@@ -21,99 +21,90 @@
 
 <main>
 
-<!-- 1. At a glance -->
 <section class="hero wrap">
-  <p class="eyebrow">Case study &middot; March 2026 to now</p>
-  <h1>An MCAT study app, from a flashcard tool to a full study platform</h1>
-  <p class="lede">I own the product: I set the requirements and quality bars, design the screens, and test every release. A team of AI coding agents writes the code under rules I set. B.Sc. Biochemistry (University of Winnipeg) and IT Operations diploma (Red River College).</p>
+  <p class="eyebrow">March 2026 to now</p>
+  <h1>I'm building a free MCAT study app</h1>
+  <p class="lede">It started as a flashcard app for myself. It plans your study, asks exam-style questions and explains every answer. I run the product and test everything. AI coding agents write the code, under rules I set.</p>
 
   <figure class="video card">
     <video controls preload="metadata" playsinline poster="poster.webp" width="1920" height="1080">
       <source src="demo.mp4" type="video/mp4">
     </video>
-    <figcaption>Demo, 1 minute 27 seconds, captioned, no sound needed. The real app, full window, as it is today.</figcaption>
+    <figcaption>Demo, 1:27</figcaption>
   </figure>
 
   <ul class="facts" aria-label="Key facts">
-    <li><strong>4.87 / 5</strong><span>question explanations in a blind review, vs 4.10 for the leading paid bank</span></li>
-    <li><strong>4.60 / 5</strong><span>flashcard correctness in a blind review, vs 3.92 for the most-used free deck</span></li>
-    <li><strong>2,100+</strong><span>automated test files guarding the code</span></li>
-    <li><strong>$0</strong><span>to the student: no account, works offline, data encrypted on their own computer</span></li>
+    <li><strong>4.87 / 5</strong><span>for explanations in a blind review. UWorld got 4.10.</span></li>
+    <li><strong>4.60 / 5</strong><span>for flashcard accuracy. The MileDown deck got 3.92.</span></li>
+    <li><strong>2,100+</strong><span>automated test files check the code.</span></li>
+    <li><strong>Free</strong><span>No account. Works offline. Your data stays on your computer.</span></li>
   </ul>
 </section>
 
-<!-- 2. Problem -->
 <section class="wrap block">
-  <h2>The problem</h2>
-  <p>Good MCAT prep costs over a thousand dollars. Students trust the official AAMC questions but find the explanations thin; they like the explanations in commercial banks but many cannot afford them. I wanted one free app that plans the whole study period, teaches from real textbooks, and explains every answer step by step.</p>
+  <h2>Why I'm building it</h2>
+  <p>Good MCAT prep costs thousands of dollars. That shouldn't decide who gets into medicine. Students trust the AAMC questions, but the explanations are thin. UWorld explains well, but a lot of people can't afford it. This app gives students both, for free.</p>
 </section>
 
-<!-- 3. What it does -->
 <section class="wrap block">
   <h2>What it does</h2>
   <div class="grid three">
-    <article class="card pad"><h3>Plans every day</h3><p>Enter your exam date and free time; it builds a day-by-day plan with catch-up and rest days, and full-length practice exams on the way.</p></article>
-    <article class="card pad"><h3>Questions in the AAMC format</h3><p>Passage first, timer, flagging. Get one wrong and the explanation shows why your choice fails and why the right one works.</p></article>
-    <article class="card pad"><h3>Flashcards that space themselves</h3><p>Spaced repetition (FSRS) with basic, cloze, table, image and figure cards. Imports and exports Anki decks.</p></article>
-    <article class="card pad"><h3>Built from real sources</h3><p>Science from OpenStax open textbooks; reading passages taken word for word from public-domain classics and open-access essays.</p></article>
-    <article class="card pad"><h3>Writes new questions</h3><p>A generator turns a source section into a new question; several AI models and code checks each have one job, and any one can reject the item.</p></article>
-    <article class="card pad"><h3>Private and offline</h3><p>Desktop app for Windows and Mac. Study data stays on the student's computer, encrypted. A phone companion pairs to it.</p></article>
+    <article class="card pad"><h3>Plans every day</h3><p>You enter your exam date and how much time you have. It plans every day from now to test day.</p></article>
+    <article class="card pad"><h3>Exam-style questions</h3><p>The passage comes first, like the real MCAT. Get one wrong and it walks you through why.</p></article>
+    <article class="card pad"><h3>Flashcards</h3><p>Cards come back just before you'd forget them. You can bring in your Anki decks too.</p></article>
+    <article class="card pad"><h3>Real sources</h3><p>The science comes from OpenStax textbooks. The reading passages are real excerpts, word for word.</p></article>
+    <article class="card pad"><h3>Writes new questions</h3><p>It writes questions from the textbook. Several checks look at each one, and any of them can throw it out.</p></article>
+    <article class="card pad"><h3>Private</h3><p>It runs on your own computer, encrypted. Nothing is sent anywhere unless you turn it on.</p></article>
   </div>
 </section>
 
-<!-- 4. Screens -->
 <section class="wrap block" id="screens">
   <h2>Screens</h2>
-  <p class="sub">Full window, no cropping. Select any image to see it full size.</p>
   <div class="gallery" data-gallery></div>
 </section>
 
-<!-- 5. How it grew -->
 <section class="wrap block">
   <h2>How it grew</h2>
   <ol class="timeline">
-    <li><span class="when">Mar to Jun 2026</span><h3>A flashcard app</h3><p>A small desktop app for my own flashcards, then practice exams, a planner and stats were added one at a time.</p></li>
-    <li><span class="when">Jun to Aug</span><h3>Rebuilt properly</h3><p>Moved to a modern React app. Wrote a feature checklist first so nothing from the old version was lost; 910 automated tests passing at the restart.</p></li>
-    <li><span class="when">September</span><h3>Design and data</h3><p>Redesigned every screen, added the textbook library, the encrypted local vault and Anki import. Set up the AI agent workflow with independent checks.</p></li>
-    <li><span class="when">October</span><h3>Question generator</h3><p>Built and tuned the question generator, ran blind comparisons against official and commercial questions, added the phone companion. Tried a 3D study world, then cut it.</p></li>
-    <li><span class="when">November</span><h3>Writing the bank</h3><p>Writing and checking the full question and flashcard banks for launch to pre-med students at the University of Manitoba first.</p></li>
+    <li><span class="when">Mar to Jun</span><h3>Flashcards</h3><p>A small flashcard app for myself. Then practice exams, a planner and stats.</p></li>
+    <li><span class="when">Jun to Aug</span><h3>A proper app</h3><p>Built again from the ground up. I listed every feature first so nothing got lost.</p></li>
+    <li><span class="when">September</span><h3>Design</h3><p>Every screen redesigned. The textbooks, encryption and Anki import went in.</p></li>
+    <li><span class="when">October</span><h3>Question writer</h3><p>The question writer, tested blind against the real thing. The phone app went in too.</p></li>
+    <li><span class="when">November</span><h3>The question bank</h3><p>Writing the full bank. It goes to pre-med students at the U of M first.</p></li>
   </ol>
 </section>
 
-<!-- 6. Decisions -->
 <section class="wrap block">
-  <h2>Decisions I made</h2>
+  <h2>Calls I made</h2>
   <div class="grid two">
-    <article class="card pad"><h3>Cut a feature that looked great</h3><p>The team built a photoreal 3D world for the home screen. It was impressive but slow and pulled focus from studying. I retired it after two weeks and kept a simple illustrated plan instead.</p></article>
-    <article class="card pad"><h3>If it can't be traced, it's thrown out</h3><p>Every question and card must point to the exact textbook section it came from and pass a check against it. An audit found errors in one source book; those sections were withheld.</p></article>
-    <article class="card pad"><h3>Nothing counts as done until it's checked</h3><p>A task is done only with a recorded test run and a second, independent AI reviewer that sees the change but not the builder's reasoning. Release rules are enforced by scripts, not memory.</p></article>
-    <article class="card pad"><h3>Privacy first</h3><p>No accounts and no cloud by default. Study data is encrypted on the student's own machine; AI features are optional and use the student's own key.</p></article>
+    <article class="card pad"><h3>Cut the 3D world</h3><p>We built a 3D world for the home screen. It looked great, but it was slow and pulled focus from studying. I cut it.</p></article>
+    <article class="card pad"><h3>No made-up facts</h3><p>Every question and card has to trace back to the textbook. If it can't, it's thrown out.</p></article>
+    <article class="card pad"><h3>Nothing goes in unchecked</h3><p>Every change is tested and checked by a separate reviewer before it goes in.</p></article>
+    <article class="card pad"><h3>Your data is yours</h3><p>No account and no cloud. AI is optional, and it uses your own key.</p></article>
   </div>
 </section>
 
-<!-- 7. Evidence -->
 <section class="wrap block">
-  <h2>Does it work?</h2>
+  <h2>Results</h2>
   <div class="grid two">
     <article class="card pad">
-      <h3>Blind question review</h3>
-      <p class="sub">Biology and biochemistry questions mixed with official and commercial ones, sources hidden, each scored 1 to 5 by two independent raters.</p>
+      <h3>Questions, scored blind</h3>
+      <p class="sub">Biology and biochemistry. Ours were mixed in with AAMC and UWorld questions, names hidden, and scored 1 to 5.</p>
       <table class="scores">
-        <thead><tr><th scope="col">Measure</th><th scope="col">This app</th><th scope="col">Leading paid bank</th><th scope="col">Official AAMC</th></tr></thead>
+        <thead><tr><th scope="col"></th><th scope="col">Ours</th><th scope="col">UWorld</th><th scope="col">AAMC</th></tr></thead>
         <tbody>
           <tr><th scope="row">Explanation</th><td>4.87</td><td>4.10</td><td>3.08</td></tr>
           <tr><th scope="row">Answer key</th><td>4.73</td><td>4.80</td><td>3.78</td></tr>
           <tr><th scope="row">Reasoning</th><td>4.91</td><td>5.00</td><td>4.53</td></tr>
-          <tr><th scope="row">Format</th><td>4.96</td><td>5.00</td><td>4.95</td></tr>
+          <tr><th scope="row">Reads like the exam</th><td>4.96</td><td>5.00</td><td>4.95</td></tr>
         </tbody>
       </table>
-      <p class="note">Explanations score highest of the three. Reasoning and format match the leading paid bank. The reading (CARS) writer is the current focus, with a new version in testing.</p>
     </article>
     <article class="card pad">
-      <h3>Blind flashcard review</h3>
-      <p class="sub">96 cards on six topics, drawn identically with no labels, scored 1 to 5 by two independent raters.</p>
+      <h3>Flashcards, scored blind</h3>
+      <p class="sub">96 cards on six topics, all drawn the same way with no names, and scored 1 to 5.</p>
       <table class="scores">
-        <thead><tr><th scope="col">Measure</th><th scope="col">This app</th><th scope="col">MileDown deck</th><th scope="col">AnKing-style deck</th></tr></thead>
+        <thead><tr><th scope="col"></th><th scope="col">Ours</th><th scope="col">MileDown</th><th scope="col">AnKing-style</th></tr></thead>
         <tbody>
           <tr><th scope="row">Correct</th><td>4.60</td><td>3.92</td><td>3.56</td></tr>
           <tr><th scope="row">Depth</th><td>3.02</td><td>2.13</td><td>2.71</td></tr>
@@ -121,49 +112,45 @@
           <tr><th scope="row">Study value</th><td>3.79</td><td>3.02</td><td>2.81</td></tr>
         </tbody>
       </table>
-      <p class="note">Highest on all four measures. The raters agreed closely: on average 0.21 apart on the same card.</p>
     </article>
   </div>
   <div class="grid two after">
     <article class="card pad">
-      <h3>Built to be reliable</h3>
+      <h3>Reliability</h3>
       <ul class="plain">
-        <li><strong>2,100+</strong> automated test files: unit, interface and end-to-end tests that drive the real app.</li>
-        <li>Every change is checked by a separate reviewer and a recorded test run before it is merged.</li>
-        <li>Every question and card is traced to its textbook section and checked against it.</li>
-        <li>Imports large Anki decks (6,000+ notes) in under 30 seconds.</li>
+        <li>Over 2,100 automated test files, including tests that use the real app.</li>
+        <li>Every change is tested and reviewed before it goes in.</li>
+        <li>Every question and card traces back to its textbook section.</li>
+        <li>A big Anki deck, over 6,000 notes, comes in under 30 seconds.</li>
       </ul>
     </article>
     <article class="card pad">
-      <h3>Compared with what students use</h3>
+      <h3>What students use now</h3>
       <table class="scores compare">
         <thead><tr><th scope="col"></th><th scope="col">Price</th><th scope="col">What students say</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Official AAMC</th><td>about $324</td><td>Most exam-like; explanations too thin</td></tr>
-          <tr><th scope="row">UWorld</th><td>from $339</td><td>Great explanations; hard to afford</td></tr>
-          <tr><th scope="row">Blueprint</th><td>$1,499+</td><td>Structured; video-heavy and costly</td></tr>
-          <tr><th scope="row">Anki decks</th><td>Free</td><td>Huge coverage; gaps and errors to fix</td></tr>
-          <tr><th scope="row">This app</th><td>Free</td><td>Exam-style questions, step-by-step explanations, daily plan, sourced cards</td></tr>
+          <tr><th scope="row">AAMC</th><td>about $324</td><td>Most like the exam. Thin explanations.</td></tr>
+          <tr><th scope="row">UWorld</th><td>from $339</td><td>Great explanations. Expensive.</td></tr>
+          <tr><th scope="row">Blueprint</th><td>$1,499+</td><td>Structured. Lots of video.</td></tr>
+          <tr><th scope="row">Anki decks</th><td>Free</td><td>Huge, but with gaps and errors.</td></tr>
+          <tr><th scope="row">This app</th><td>Free</td><td>Exam-style questions, full explanations and a daily plan.</td></tr>
         </tbody>
       </table>
-      <p class="note">From my review of student discussions and product pages, September 2026. Prices in USD.</p>
     </article>
   </div>
 </section>
 
-<!-- 8. Role -->
 <section class="wrap block">
-  <h2>My role, plainly</h2>
+  <h2>What I do</h2>
   <div class="card pad role">
-    <p><strong>I did:</strong> product vision and requirements, screen design and review, quality bars (for example "answer key within 0.3 of the leading bank"), the agent workflow and its rules, hands-on testing and bug reports, the subject-matter checks from my biochemistry degree, and every keep-or-cut call.</p>
-    <p><strong>How it is engineered:</strong> I lead a team of AI coding agents (Claude Code, OpenAI Codex), each with one role: planner, builder, designer and an independent reviewer. They write the code to my specs; nothing merges without passing tests and review.</p>
-    <p><strong>What this shows for your team:</strong> I can turn a fuzzy goal into clear requirements, test against them, catch wrong output, and get results out of AI tools safely.</p>
+    <p>I decide what the app does and how good it has to be. I design the screens, test every release and catch what's wrong. My biochemistry degree lets me check the science myself.</p>
+    <p>A team of AI coding agents writes the code, using Claude Code and OpenAI Codex. Each one has a job: plan, build, design or review. I set the rules they work by.</p>
   </div>
 </section>
 
 <section class="wrap block contact">
-  <h2>Let's talk</h2>
-  <p>Looking for IT analyst, QA, health-tech and lab roles in Winnipeg or remote.</p>
+  <h2>Get in touch</h2>
+  <p>I'm looking for IT, QA, health tech and lab roles in Winnipeg or remote.</p>
   <p><a class="btn" href="mailto:bodiraj93@gmail.com">Email me</a> <a class="btn subtle" href="https://www.linkedin.com/in/bodi-raj/">LinkedIn</a></p>
 </section>
 
@@ -175,7 +162,7 @@
   <p class="cap"></p>
 </dialog>
 
-<footer class="wrap foot"><p>The app's name is withheld until launch. Screens show the app with demo study data.</p></footer>
+<footer class="wrap foot"><p>The app's name comes at launch.</p></footer>
 
 <script src="shots.js"></script>
 <script src="site.js"></script>
