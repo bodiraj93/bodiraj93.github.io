@@ -124,3 +124,14 @@ dialog .close { position: absolute; top: 8px; right: 8px; padding: 4px 12px; bor
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 .feature { border-left: 3px solid var(--brand); }
 .feature p { color: var(--fg2); max-width: 90ch; }
+.intro { max-width: 90ch; color: var(--fg2); margin-bottom: 20px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: s; }
+.steps.seven { grid-template-columns: repeat(4, 1fr); }
+.steps li { counter-increment: s; background: var(--bg1); border-radius: var(--r-xl); box-shadow: var(--shadow4); padding: 20px; }
+.steps li::before { content: counter(s); display: inline-grid; place-items: center; width: 28px; height: 28px; margin-bottom: 10px; border-radius: 50%; background: var(--brand-bg2); color: var(--brand-fg); font: 600 14px/1 var(--font); }
+.steps li.gate { border-top: 3px solid var(--brand); }
+.steps p { margin: 0; color: var(--fg2); font-size: 14px; line-height: 20px; }
+@media (max-width: 960px) { .steps, .steps.seven { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .steps, .steps.seven { grid-template-columns: 1fr; } }
+.diff { background: var(--brand-bg2); box-shadow: none; }
+.diff p { color: var(--fg2); font-size: 15px; line-height: 22px; margin: 0; }
