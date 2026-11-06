@@ -30,7 +30,7 @@
     <video controls preload="metadata" playsinline poster="poster.webp" width="1920" height="1080">
       <source src="demo.mp4" type="video/mp4">
     </video>
-    <figcaption>Demo, 1:27</figcaption>
+    <figcaption>Demo, 1:00</figcaption>
   </figure>
 
   <ul class="facts" aria-label="Key facts">
@@ -75,12 +75,28 @@
 </section>
 
 <section class="wrap block">
-  <h2>Key decisions</h2>
+  <h2>Product decisions</h2>
   <div class="grid two">
     <article class="card pad"><h3>Cut a feature that looked great</h3><p>We built a 3D world for the home screen. It was impressive, but it slowed the app and pulled focus from studying, so I removed it.</p></article>
     <article class="card pad"><h3>Every fact is sourced</h3><p>Every question and card must trace back to a textbook section. Anything that can't is discarded.</p></article>
     <article class="card pad"><h3>Nothing ships unchecked</h3><p>Every change is tested and approved by a separate reviewer before it is merged.</p></article>
     <article class="card pad"><h3>Privacy first</h3><p>No account and no cloud storage. AI features are optional and use the student's own key.</p></article>
+  </div>
+</section>
+
+<section class="wrap block">
+  <h2>Engineering decisions</h2>
+  <article class="card pad feature">
+    <h3>Local only, and encrypted</h3>
+    <p>Most apps today are cloud subscriptions that keep your data on their servers. I chose the opposite. Students' study records sit close to health and medical information, and that kind of data should not be sent over the internet without their say. Everything stays on the student's own computer, in an encrypted database (SQLCipher). There is no account and no cloud storage, and the app works fully offline. AI features are optional and use the student's own key, so nothing is shared unless they choose it.</p>
+  </article>
+  <div class="grid three after">
+    <article class="card pad"><h3>Migration to React</h3><p>The original app had grown to about 30,000 lines of plain JavaScript and was getting risky to change. I moved it to React, starting from a full feature inventory so nothing was lost, and old code was retired only after a script proved nothing still used it.</p></article>
+    <article class="card pad"><h3>Single owners</h3><p>Every rule lives in exactly one place. One module decides what is due for review, and the home screen, study sessions, flashcards and planner all read from it. When two screens work something out separately, they eventually disagree. One owner means one answer and one place to fix.</p></article>
+    <article class="card pad"><h3>Headless logic</h3><p>Scheduling, pacing and planning are pure functions with no screen, clock or storage inside them. They can be tested thoroughly on their own and behave the same wherever they are used.</p></article>
+    <article class="card pad"><h3>Clear state management</h3><p>State is split into four layers: shared logic, encrypted study data, settings and background services. Each screen's state has exactly one owner in the store (Zustand), so any bug traces back to one place.</p></article>
+    <article class="card pad"><h3>A plan that can't go stale</h3><p>A saved study plan is out of date the moment a student misses a day. So the plan is never stored. It is recalculated from the student's real progress every time, and every change they make is applied the same way.</p></article>
+    <article class="card pad"><h3>Locked-down desktop shell</h3><p>Even a local app should limit what can go wrong. The Electron shell runs sandboxed, the interface reaches the system only through an approved list of channels, and every response is checked at that boundary.</p></article>
   </div>
 </section>
 
