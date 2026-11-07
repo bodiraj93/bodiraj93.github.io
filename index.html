@@ -36,7 +36,7 @@
 <section class="hero wrap">
   <p class="eyebrow">March 2026 to now</p>
   <h1>Skopos, a free MCAT study app, built and led by me</h1>
-  <p class="lede">It began as a personal flashcard tool and has grown into a complete study platform: a daily plan built around the exam date, questions in the AAMC format with detailed explanations, and spaced-repetition flashcards. I lead the product and test every release. A team of AI coding agents writes the code, working to the rules I set.</p>
+  <p class="lede">It began as a personal flashcard tool and has grown into a complete study platform: a daily plan built around the exam date, questions in the AAMC format with detailed explanations, and spaced-repetition flashcards. I lead the product and test every release. AI coding agents write the code inside a zero-trust test harness I designed, and nothing ships until it passes.</p>
 
   <figure class="video card">
     <video controls preload="metadata" playsinline poster="poster.webp" width="1920" height="1080">
@@ -264,7 +264,7 @@
   <h2>My role</h2>
   <div class="card pad role">
     <p>I lead the product. I define the requirements and quality standards, design the interface, and test every release. My biochemistry degree lets me verify the science content directly.</p>
-    <p>The code is written by a team of AI coding agents (Claude Code and OpenAI Codex), each with a defined role: planning, building, design or review. I set the rules and the review process they work to.</p>
+    <p>I treat AI coding agents as capable but untrusted. They write fast, and they can also hallucinate, so nothing they produce is believed until a test proves it. Over the past year I built a harness around that idea. Every task starts as a written contract, with a test designed to fail on bad work. The agents, Claude Code and OpenAI Codex, write code in isolated branches, and a second agent, blind to the first, tries to break the result. Nothing merges until the Node unit tests and the end-to-end tests pass again and leave a record that they ran. At the key gates, I run the app myself and sign off.</p>
   </div>
 </section>
 
