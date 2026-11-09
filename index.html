@@ -48,7 +48,7 @@
   <ul class="facts" aria-label="Key facts">
     <li><strong>4.87 / 5</strong><span>explanation quality in a blind AI review, against 4.10 for UWorld</span></li>
     <li><strong>4.60 / 5</strong><span>flashcard accuracy, against 3.92 for the MileDown deck</span></li>
-    <li><strong>2,100+</strong><span>automated test files</span></li>
+    <li><strong>Nearly 2,000</strong><span>automated test files</span></li>
     <li><strong>Free</strong><span>Does not require an account. Works offline, and study data stays on the student's computer.</span></li>
   </ul>
 </section>
@@ -126,7 +126,7 @@
     <article class="card pad">
       <h3>Reliability</h3>
       <ul class="plain">
-        <li>Over 2,100 automated test files, including end-to-end tests that drive the real app.</li>
+        <li>Nearly 2,000 automated test files, including end-to-end tests that drive the real app.</li>
         <li>Every change is tested and reviewed before it is merged.</li>
         <li>Every question and card traces back to its textbook section.</li>
         <li>Imports Anki decks of over 6,000 notes in under 30 seconds.</li>
@@ -146,8 +146,8 @@
     <li><span class="when">Mar to Jun</span><h3>Flashcard tool</h3><p>A personal flashcard app, extended with practice exams, a planner and statistics.</p></li>
     <li><span class="when">Jun to Aug</span><h3>Full rebuild</h3><p>Rebuilt on a modern framework, with every existing feature listed first so that every one was kept.</p></li>
     <li><span class="when">September</span><h3>Design and data</h3><p>Every screen redesigned. Textbook library, encrypted storage and Anki import added.</p></li>
-    <li><span class="when">October</span><h3>Question generator</h3><p>Generator built and tested blind against official and commercial questions. Phone companion added.</p></li>
-    <li><span class="when">November</span><h3>Question bank</h3><p>Completing the full bank ahead of launch to pre-med students at the University of Manitoba.</p></li>
+    <li><span class="when">October</span><h3>Question generator</h3><p>Generator built and tested blind against official and commercial questions. Phone companion designed.</p></li>
+    <li><span class="when">November</span><h3>Question bank</h3><p>Completing the full question bank.</p></li>
   </ol>
     </div>
   </details>
@@ -155,7 +155,7 @@
     <summary><span class="dd-t">Product decisions</span><span class="dd-s">What was cut, what was required, and why.</span></summary>
     <div class="dd-body">
 <div class="grid two">
-    <article class="card pad"><h3>Cut a feature that looked great</h3><p>We built a 3D world for the home screen. It was impressive, but it slowed the app and pulled focus from studying, so I removed it.</p></article>
+    <article class="card pad"><h3>Cut a feature that looked great</h3><p>I built a 3D world for the home screen. It was impressive, but it slowed the app and pulled focus from studying, so I removed it.</p></article>
     <article class="card pad"><h3>Every fact is sourced</h3><p>Every question and card must trace back to a textbook section. Anything that cannot is discarded.</p></article>
     <article class="card pad"><h3>Every change is checked</h3><p>Every change is tested and approved by a separate reviewer before it is merged.</p></article>
     <article class="card pad"><h3>Privacy first</h3><p>The app does not require an account and does not use cloud storage. AI features are optional and use the student's own key.</p></article>
@@ -175,14 +175,14 @@
     <article class="card pad"><h3>Headless logic</h3><p>Scheduling, pacing and planning are pure functions that do not depend on the screen, the clock or storage. They can be tested thoroughly on their own and behave the same wherever they are used.</p></article>
     <article class="card pad"><h3>Clear state management</h3><p>State is split into four layers: shared logic, encrypted study data, settings and background services. Each screen's state has exactly one owner in the store (Zustand), so any bug traces back to one place.</p></article>
     <article class="card pad"><h3>A plan that cannot go stale</h3><p>A saved study plan is out of date the moment a student misses a day. So the plan is not stored. It is recalculated from the student's real progress every time, and every change they make is applied the same way.</p></article>
-    <article class="card pad"><h3>Locked-down desktop shell</h3><p>Even a local app should limit what can go wrong. The Electron shell runs sandboxed, the interface reaches the system only through an approved list of channels, and every response is checked at that boundary.</p></article>
+    <article class="card pad"><h3>Locked-down desktop shell</h3><p>Even a local app should limit what can go wrong. In the Electron shell, the interface code is kept apart from the system and cannot load system modules. It reaches the system only through an approved list of channels, and every response is checked at that boundary.</p></article>
   </div>
     </div>
   </details>
   <details class="dd">
-    <summary><span class="dd-t">The AI router</span><span class="dd-s">Six providers, the student's choices first, and failures that are always reported.</span></summary>
+    <summary><span class="dd-t">The AI router</span><span class="dd-s">Four providers, the student's choices first, and failures that are always reported.</span></summary>
     <div class="dd-body">
-<p class="intro">The app can work with six AI providers: Anthropic, OpenAI, Google Gemini, Mistral, Groq and Ollama, which runs models on the student's own computer. A router decides which model handles each task. I designed it around one principle: the student's choices always come first, and quality, capability and cost are weighed only within them.</p>
+<p class="intro">The app can work with four AI providers: Gemini, OpenAI, Anthropic and Groq. A router decides which model handles each task. I designed it around one principle: the student's choices always come first, and quality, capability and cost are weighed only within them.</p>
   <ol class="steps">
     <li><h3>The student's choices</h3><p>A model the student has pinned is used as is. Otherwise the router stays within their chosen provider, their quality setting and their spending limit.</p></li>
     <li><h3>What the task needs</h3><p>Each task declares what it requires, such as reading images, reading PDFs, structured output, long documents or keeping data on the computer. Models that cannot do the job are filtered out.</p></li>
@@ -191,7 +191,7 @@
   </ol>
   <p class="note">The routing decision is a pure function: the same inputs always give the same answer, without side effects, so every rule can be tested directly. Adding a new provider means registering it, not changing the router.</p>
   <div class="grid two after">
-    <article class="card pad diff"><h3>How it differs</h3><p>Most study apps are tied to one cloud AI service and send everything to it. This router works across six providers, including one that runs entirely on the student's computer, and it puts the student's choices and data rules ahead of the system's preferences.</p></article>
+    <article class="card pad diff"><h3>How it differs</h3><p>Most study apps are tied to one cloud AI service and send everything to it. This router works across four providers, and it puts the student's choices and data rules ahead of the system's preferences.</p></article>
     <article class="card pad diff"><h3>How it was proved</h3><p>Because each decision is a pure function, every rule (pins, capability filters, tier escalation, spending limits, the loud fallback) is checked directly by automated tests, without needing a live AI service.</p></article>
   </div>
     </div>
@@ -235,7 +235,7 @@
 <div class="grid two">
     <article class="card pad">
       <h3>Flashcard generator, previous version against current</h3>
-      <p class="sub">Same blind test, same raters, same six topics.</p>
+      <p class="sub">Same blind test, same six topics.</p>
       <table class="scores">
         <thead><tr><th scope="col"></th><th scope="col">Current</th><th scope="col">Previous version</th></tr></thead>
         <tbody>
