@@ -1,0 +1,59 @@
+/* Page parts built from the site tokens in site.css */
+.flow { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 28px; }
+.flow li { position: relative; flex: 1 1 100px; background: var(--bg1); border-radius: var(--r-xl); box-shadow: var(--shadow4); padding: 12px 14px; font-size: 14px; line-height: 20px; color: var(--fg2); }
+.flow li b { display: block; color: var(--fg1); font-weight: 600; }
+.flow li.gate { border-top: 3px solid var(--brand); }
+.flow li:not(:last-child)::after { content: ""; position: absolute; right: -19px; top: 50%; width: 10px; height: 10px; border-top: 2px solid var(--fg3); border-right: 2px solid var(--fg3); transform: translateY(-50%) rotate(45deg); }
+.legend { margin: -12px 0 24px; color: var(--fg3); font-size: 14px; line-height: 20px; }
+.legend i { display: inline-block; width: 18px; height: 3px; background: var(--brand); vertical-align: middle; margin-right: 6px; }
+pre.code { margin: 8px 0 0; padding: 12px 14px; background: var(--bg3); border-radius: var(--r-m); overflow-x: auto; font: 13px/19px Consolas, "Cascadia Mono", Menlo, monospace; color: var(--fg1); white-space: pre-wrap; word-break: break-word; }
+.cite { color: var(--fg3); font-size: 13px; line-height: 18px; }
+.cite code, .grid p code, .plain code, .intro code, .walk code, .panel code { font: 13px Consolas, "Cascadia Mono", Menlo, monospace; }
+.walk { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: w; }
+.walk > li { counter-increment: w; background: var(--bg1); border-radius: var(--r-xl); box-shadow: var(--shadow4); padding: 20px 24px; }
+.walk > li h3::before { content: counter(w) ". "; color: var(--brand-fg); }
+.walk > li p { color: var(--fg2); }
+.walk > li .tag { display: inline-block; margin-bottom: 8px; padding: 2px 10px; border-radius: 999px; background: var(--brand-bg2); color: var(--brand-fg); font: 600 12px/18px var(--font); }
+.js .walk > li[hidden] { display: none; }
+.js .walk > li h3::before { content: none; }
+.controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.controls .count { margin-left: 4px; color: var(--fg3); font-size: 14px; }
+button.btn { border: 0; cursor: pointer; }
+button.btn[disabled] { opacity: .45; cursor: default; }
+.dots { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 12px; padding: 0; list-style: none; }
+.dots button { all: unset; cursor: pointer; padding: 4px 10px; border-radius: 999px; background: var(--bg1); box-shadow: 0 0 2px var(--sh-a), 0 1px 2px var(--sh-k); font: 600 13px/18px var(--font); color: var(--fg2); }
+.dots button[aria-current="step"] { background: var(--brand); color: #fff; }
+.dots button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.explorer { display: none; }
+.js .explorer { display: block; }
+.grades { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.grades button { min-width: 88px; }
+.grades button[aria-pressed="true"] { outline: 2px solid var(--brand-fg); outline-offset: 2px; }
+.readout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 12px 0 0; padding: 0; list-style: none; }
+.readout li { background: var(--bg2); border-radius: var(--r-xl); padding: 12px 14px; font-size: 14px; line-height: 20px; color: var(--fg2); }
+.readout strong { display: block; font: 600 24px/32px var(--display); color: var(--brand-fg); }
+.scroll { overflow-x: auto; }
+.scores.walktable td { white-space: nowrap; }
+.scores.walktable td:nth-child(2) { font-weight: 400; color: var(--fg2); }
+.scores tr.on { background: var(--brand-bg2); }
+.pipe { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.pipe li { position: relative; }
+.pipe li:not(:last-child)::after { content: ""; position: absolute; right: -15px; top: 50%; width: 8px; height: 8px; border-top: 2px solid var(--fg3); border-right: 2px solid var(--fg3); transform: translateY(-50%) rotate(45deg); }
+.pipe button { all: unset; cursor: pointer; display: block; padding: 8px 14px; border-radius: var(--r-m); background: var(--bg1); box-shadow: var(--shadow4); font: 600 14px/20px var(--font); color: var(--fg1); }
+.pipe button.gate { border-top: 3px solid var(--brand); }
+.pipe button[aria-expanded="true"] { background: var(--brand); color: #fff; }
+.pipe button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.nojs-pipe { display: block; }
+.js .nojs-pipe { display: none; }
+.pipe { display: none; }
+.js .pipe { display: flex; }
+.panels { display: grid; gap: 12px; }
+.js .panels .panel[hidden] { display: none; }
+.panel h3 .kind { margin-left: 8px; color: var(--fg3); font-weight: 400; font-size: 14px; }
+.panel .eg { margin-top: 12px; padding: 12px 14px; border-left: 3px solid var(--brand); background: var(--bg2); border-radius: 0 var(--r-m) var(--r-m) 0; }
+.panel .eg p { margin: 0; }
+.panel .eg b { color: var(--fg1); }
+.catches li { margin-bottom: 12px; }
+.space { margin-top: 20px; }
+@media (max-width: 960px) { .readout { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .flow li:not(:last-child)::after { display: none; } .pipe li::after { display: none; } }
