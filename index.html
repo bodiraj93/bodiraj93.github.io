@@ -16,7 +16,7 @@
 <meta name="google-site-verification" content="jhf5IRQitZD0IKRXEUvw29WtyQls0X3uq4EDKf5aHxo">
 <link rel="canonical" href="https://bodiraj93.github.io/">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Bodi Rajamanthri", "url": "https://bodiraj93.github.io/", "email": "mailto:bodiraj93@gmail.com", "jobTitle": "Product Lead", "address": {"@type": "PostalAddress", "addressLocality": "Winnipeg", "addressRegion": "MB", "addressCountry": "CA"}, "alumniOf": [{"@type": "CollegeOrUniversity", "name": "Red River College Polytechnic"}, {"@type": "CollegeOrUniversity", "name": "University of Winnipeg"}], "knowsAbout": ["IT support", "Quality assurance", "Software testing", "Product management", "Biochemistry", "Laboratory skills", "Automotive electrical"], "sameAs": ["https://www.linkedin.com/in/bodi-raj/"]}</script>
-<link rel="stylesheet" href="site.css?v=6">
+<link rel="stylesheet" href="site.css?v=7">
 </head>
 <body>
 
@@ -30,6 +30,9 @@
     </nav>
   </div>
 </header>
+<nav class="secnav" aria-label="Pages and sections">
+  <div class="wrap secnav-row"><a class="tab" href="index.html" aria-current="page">Case study</a><a class="tab" href="skopos-deep-dive.html">Technical deep dive</a><span class="sep" aria-hidden="true"></span><a href="#problem">The problem</a><a href="#what">What it does</a><a href="#screens">Screens</a><a href="#results">Results</a><a href="#built">How it's built</a><a href="#role">My role</a><a href="#hands-on">Hands-on engineering</a><a href="#contact">Get in touch</a></div>
+</nav>
 
 <main>
 
@@ -53,11 +56,7 @@
   </ul>
 </section>
 
-<nav class="jump wrap" aria-label="On this page">
-  <a href="#what">What it does</a><a href="#screens">Screens</a><a href="#results">Results</a><a href="#built">How it's built</a><a href="#role">My role</a>
-</nav>
-
-<section class="wrap block">
+<section class="wrap block" id="problem">
   <h2>The problem</h2>
   <p>Quality MCAT preparation costs thousands of dollars, and that cost should not decide who gets into medicine. Students trust the official AAMC questions but find the explanations thin. UWorld explains well, but many students cannot afford it. This app offers both, for free.</p>
 </section>
@@ -266,10 +265,9 @@
     <p>I lead the product. I define the requirements and quality standards, design the interface, and test every release. My biochemistry degree lets me verify the science content directly.</p>
     <p>I treat AI coding agents as capable but untrusted. They write fast, and they can also hallucinate, so nothing they produce is believed until a test proves it. Over the past year I built a harness around that idea. Every task starts as a written contract, with a test designed to fail on bad work. The agents, Claude Code and OpenAI Codex, write code in isolated branches, and a second agent, blind to the first, tries to break the result. Nothing merges until the Node unit tests and the end-to-end tests pass again and leave a record that they ran. At the key gates, I run the app myself and sign off.</p>
   </div>
-  <p class="note"><a href="skopos-deep-dive.html">Read the technical deep dive on the harness, the question generator, scheduling, encryption and the test suite</a></p>
 </section>
 
-<section class="wrap block">
+<section class="wrap block" id="hands-on">
   <h2>Also: hands-on engineering</h2>
   <a class="card next" href="vehicles.html">
     <img src="v-carry-hero-sm.webp" alt="Finished Suzuki Carry kei truck">
@@ -277,7 +275,7 @@
   </a>
 </section>
 
-<section class="wrap block contact">
+<section class="wrap block contact" id="contact">
   <h2>Get in touch</h2>
   <p>I'm open to IT, QA, health technology and laboratory roles in Winnipeg or remote.</p>
   <p><a class="btn" href="mailto:bodiraj93@gmail.com">Email me</a> <a class="btn subtle" href="https://www.linkedin.com/in/bodi-raj/">LinkedIn</a></p>
@@ -295,5 +293,27 @@
 
 <script src="shots.js?v=6"></script>
 <script src="site.js?v=6"></script>
+<script>
+// Section menu: mark the section on screen. Links work without this.
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.secnav a[href^="#"]'));
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var row = links[0].parentNode, on = null;
+  var secs = links.map(function (a) { return document.getElementById(a.hash.slice(1)); });
+  function update() {
+    var pick = null;
+    secs.forEach(function (s, i) { if (s.getBoundingClientRect().top <= innerHeight / 2) pick = links[i]; });
+    if (pick === on) return;
+    if (on) on.removeAttribute('aria-current');
+    on = pick;
+    if (!on) return;
+    on.setAttribute('aria-current', 'true');
+    var r = row.getBoundingClientRect(), b = on.getBoundingClientRect();
+    if (b.left < r.left || b.right > r.right) row.scrollLeft += b.left - r.left - (r.width - b.width) / 2;
+  }
+  var io = new IntersectionObserver(update, { rootMargin: '0px 0px -50% 0px' });
+  secs.forEach(function (s) { io.observe(s); });
+})();
+</script>
 </body>
 </html>

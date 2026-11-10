@@ -11,7 +11,7 @@
 <meta property="og:description" content="The zero-trust harness, the question generator, FSRS scheduling, encryption and the test suite, with the real numbers.">
 <meta property="og:image" content="https://bodiraj93.github.io/og.jpg">
 <link rel="canonical" href="https://bodiraj93.github.io/skopos-deep-dive.html">
-<link rel="stylesheet" href="site.css?v=6">
+<link rel="stylesheet" href="site.css?v=7">
 <style>
 /* Page parts built from the site tokens in site.css */
 .flow { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 28px; }
@@ -86,6 +86,9 @@ button.btn[disabled] { opacity: .45; cursor: default; }
     </nav>
   </div>
 </header>
+<nav class="secnav" aria-label="Pages and sections">
+  <div class="wrap secnav-row"><a class="tab" href="index.html">Case study</a><a class="tab" href="skopos-deep-dive.html" aria-current="page">Technical deep dive</a><span class="sep" aria-hidden="true"></span><a href="#harness">The harness</a><a href="#generator">The generator</a><a href="#scheduler">Planner and FSRS</a><a href="#data">Data and encryption</a><a href="#testing">Test suite</a></div>
+</nav>
 
 <main>
 
@@ -95,10 +98,6 @@ button.btn[disabled] { opacity: .45; cursor: default; }
   <p class="lede">Skopos is a free MCAT study app in development for Windows and Mac. AI coding agents wrote its code and its tests. I wrote the task contracts and the project rules, including the rule that every task needs a test that fails on bad work. This page covers five parts of the project: the harness that checks the agents, the question generator, the planner and FSRS scheduling, data protection, and the test suite. The figures come from my project handbook, which was checked against the code, and from the code and the project plan directly.</p>
   <p class="note"><a href="index.html">Back to the case study</a></p>
 </section>
-
-<nav class="jump wrap" aria-label="On this page">
-  <a href="#harness">The harness</a><a href="#generator">The generator</a><a href="#scheduler">Planner and FSRS</a><a href="#data">Data and encryption</a><a href="#testing">Test suite</a>
-</nav>
 
 <!-- 1. HARNESS -->
 <section class="wrap block" id="harness">
@@ -448,6 +447,28 @@ button.btn[disabled] { opacity: .45; cursor: default; }
     buttons.forEach(function (b) { b.addEventListener('click', function () { open(b.getAttribute('aria-controls')); }); });
     open('st-plan');
   }
+})();
+</script>
+<script>
+// Section menu: mark the section on screen. Links work without this.
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.secnav a[href^="#"]'));
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var row = links[0].parentNode, on = null;
+  var secs = links.map(function (a) { return document.getElementById(a.hash.slice(1)); });
+  function update() {
+    var pick = null;
+    secs.forEach(function (s, i) { if (s.getBoundingClientRect().top <= innerHeight / 2) pick = links[i]; });
+    if (pick === on) return;
+    if (on) on.removeAttribute('aria-current');
+    on = pick;
+    if (!on) return;
+    on.setAttribute('aria-current', 'true');
+    var r = row.getBoundingClientRect(), b = on.getBoundingClientRect();
+    if (b.left < r.left || b.right > r.right) row.scrollLeft += b.left - r.left - (r.width - b.width) / 2;
+  }
+  var io = new IntersectionObserver(update, { rootMargin: '0px 0px -50% 0px' });
+  secs.forEach(function (s) { io.observe(s); });
 })();
 </script>
 </body>
