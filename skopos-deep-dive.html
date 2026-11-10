@@ -228,7 +228,7 @@
 <!-- 4. DATA -->
 <section class="wrap block" id="data">
   <h2>4. Data and encryption</h2>
-  <p class="intro">A student's study history is personal. I decided Skopos has no account and no server, and that study data stays on the student's own computer. It is stored in one SQLCipher database. SQLCipher is a version of SQLite that encrypts the whole database file.</p>
+  <p class="intro">Because a student's study history is personal, I decided Skopos has no account and no server, and that study data stays on the student's own computer. It is stored in one SQLCipher database. SQLCipher is a version of SQLite that encrypts the whole database file.</p>
   <div class="grid three">
     <article class="card pad"><h3>Key storage</h3><p>A random 32-byte key is generated on first run and stored through Electron safeStorage, which uses the protected storage of the operating system. If that storage is unavailable, the key manager refuses to run. There is no plain-text fallback, because a key saved in plain text beside the database would undo the encryption. AI provider keys and the phone pairing secret are stored the same way.</p></article>
     <article class="card pad"><h3>How encryption is tested</h3><p>A plain SQLite file always begins with the bytes <code>SQLite format 3</code>. An end-to-end test starts the real app and fails if the database file begins with them. When a vault created by the test simulation is opened with the plain SQLite library and no key, the library returns "file is not a database".</p></article>
@@ -237,7 +237,7 @@
 
   <div class="grid two after">
     <article class="card pad"><h3>Plain copies removed once the vault is verified</h3><p>After the move into the vault, the old plain <code>Skopos_Data.json</code> and its plain <code>.bak</code> copies are deleted once the vault opens and verifies. They are never deleted in safe mode, because there they hold the live data. This is the task shown in the walk-through above.</p></article>
-    <article class="card pad"><h3>A save that always leaves a data file</h3><p>Windows can refuse a rename. In that case the save moves the old file aside and keeps it, so a crash at any point leaves a data file that the next start can load. The aside copy is removed after the next successful save. A unit test simulates a crash at that point and checks the next start.</p></article>
+    <article class="card pad"><h3>A save that always leaves a data file</h3><p>When Windows refuses a rename, the save moves the old file aside and keeps it, so a crash at any point leaves a data file that the next start can load. The aside copy is removed after the next successful save. A unit test simulates a crash at that point and checks the next start.</p></article>
     <article class="card pad"><h3>A locked vault is never deleted</h3><p>If the key file is lost and the vault remains, the app never deletes or replaces the vault. The student sees a recovery screen titled "Your study data is locked", in words I approved, with two buttons, "Restore a backup" and "Copy details".</p></article>
     <article class="card pad"><h3>Deletes handled in code</h3><p>The database schema declares that deleting a deck deletes its notes, and SQLite enforces that only when foreign keys are switched on. The app does not switch them on, so the deletes are done in code, the schema clauses are labelled "dead by design", and a test checks that deleting a deck leaves no orphan rows.</p></article>
   </div>
