@@ -39,7 +39,7 @@
 
 <section class="hero wrap">
   <p class="eyebrow">March 2026 to now</p>
-  <h1>Skopos, a free MCAT study app, built and led by me</h1>
+  <h1>Skopos is a free MCAT study app that I built and lead</h1>
   <p class="lede">It began as a personal flashcard tool and has grown into a complete study platform: a daily plan built around the exam date, questions in the AAMC format with detailed explanations, and spaced-repetition flashcards. I lead the product and test every release. AI coding agents write the code inside a zero-trust test harness I designed, and nothing ships until it passes.</p>
 
   <figure class="video card">
@@ -83,7 +83,7 @@
   <h2>Results</h2>
   <div class="grid two">
     <article class="card pad">
-      <h3>Questions, scored blind</h3>
+      <h3>Blind scores for questions</h3>
       <p class="sub">Biology and biochemistry questions mixed with AAMC and UWorld items, sources hidden, scored 1 to 5 by an AI rater in two independent blind runs.</p>
       <table class="scores">
         <thead><tr><th scope="col"></th><th scope="col">Skopos</th><th scope="col">UWorld</th><th scope="col">AAMC</th></tr></thead>
@@ -96,7 +96,7 @@
       </table>
     </article>
     <article class="card pad">
-      <h3>Flashcards, scored blind</h3>
+      <h3>Blind scores for flashcards</h3>
       <p class="sub">96 cards across six topics, presented identically without labels, scored 1 to 5 in blind AI ratings.</p>
       <table class="scores">
         <thead><tr><th scope="col"></th><th scope="col">Skopos</th><th scope="col">MileDown</th><th scope="col">AnKing-style</th></tr></thead>
@@ -156,10 +156,10 @@
     <summary><span class="dd-t">Product decisions</span><span class="dd-s">What was cut, what was required, and why.</span></summary>
     <div class="dd-body">
 <div class="grid two">
-    <article class="card pad"><h3>Cut a feature that looked great</h3><p>I built a 3D world for the home screen. It was impressive, but it slowed the app and pulled focus from studying, so I removed it.</p></article>
+    <article class="card pad"><h3>Removing the 3D home screen</h3><p>I built a 3D world for the home screen. It was impressive, but it slowed the app and pulled focus from studying, so I removed it.</p></article>
     <article class="card pad"><h3>Every fact is sourced</h3><p>Every question and card must trace back to a textbook section. Anything that cannot is discarded.</p></article>
     <article class="card pad"><h3>Every change is checked</h3><p>Every change is tested and approved by a separate reviewer before it is merged.</p></article>
-    <article class="card pad"><h3>Privacy first</h3><p>The app does not require an account and does not use cloud storage. AI features are optional and use the student's own key.</p></article>
+    <article class="card pad"><h3>Local data and optional AI features</h3><p>The app does not require an account and does not use cloud storage. AI features are optional and use the student's own key.</p></article>
   </div>
     </div>
   </details>
@@ -167,16 +167,16 @@
     <summary><span class="dd-t">Engineering decisions</span><span class="dd-s">Local and encrypted storage, the React migration, single owners, headless logic and state.</span></summary>
     <div class="dd-body">
 <article class="card pad feature">
-    <h3>Local only, and encrypted</h3>
-    <p>Most apps today are cloud subscriptions that keep your data on their servers. I chose the opposite. Students' study records sit close to health and medical information, and that kind of data should not be sent over the internet without their say. Everything stays on the student's own computer, in an encrypted database (SQLCipher). The app does not require an account, does not use cloud storage, and works fully offline. AI features are optional and use the student's own key, so data is shared only when they choose.</p>
+    <h3>Local, encrypted storage</h3>
+    <p>Skopos keeps everything on the student's own computer, unlike most apps today, which are cloud subscriptions that keep your data on their servers. Students' study records sit close to health and medical information, and that kind of data should not be sent over the internet without their say. The data is stored in an encrypted database (SQLCipher). The app does not require an account, does not use cloud storage, and works fully offline. AI features are optional and use the student's own key, so data is shared only when they choose.</p>
   </article>
   <div class="grid three after">
     <article class="card pad"><h3>Migration to React</h3><p>The original app had grown to about 30,000 lines of plain JavaScript and was getting risky to change. I moved it to React, starting from a full feature inventory so that every feature was kept, and old code was retired only after a script confirmed it was unused.</p></article>
     <article class="card pad"><h3>Single owners</h3><p>Every rule lives in exactly one place. One module decides what is due for review, and the home screen, study sessions, flashcards and planner all read from it. When two screens work something out separately, they eventually disagree. One owner means one answer and one place to fix.</p></article>
     <article class="card pad"><h3>Headless logic</h3><p>Scheduling, pacing and planning are pure functions that do not depend on the screen, the clock or storage. They can be tested thoroughly on their own and behave the same wherever they are used.</p></article>
     <article class="card pad"><h3>Clear state management</h3><p>State is split into four layers: shared logic, encrypted study data, settings and background services. Each screen's state has exactly one owner in the store (Zustand), so any bug traces back to one place.</p></article>
-    <article class="card pad"><h3>A plan that cannot go stale</h3><p>A saved study plan is out of date the moment a student misses a day. So the plan is not stored. It is recalculated from the student's real progress every time, and every change they make is applied the same way.</p></article>
-    <article class="card pad"><h3>Locked-down desktop shell</h3><p>Even a local app should limit what can go wrong. In the Electron shell, the interface code is kept apart from the system and cannot load system modules. It reaches the system only through an approved list of channels, and every response is checked at that boundary.</p></article>
+    <article class="card pad"><h3>A plan recalculated from real progress</h3><p>A saved study plan is out of date the moment a student misses a day. So the plan is not stored. It is recalculated from the student's real progress every time, and every change they make is applied the same way.</p></article>
+    <article class="card pad"><h3>Locked-down desktop shell</h3><p>In the Electron shell, the interface code is kept apart from the system and cannot load system modules. It reaches the system only through an approved list of channels, and every response is checked at that boundary.</p></article>
   </div>
     </div>
   </details>
@@ -188,7 +188,7 @@
     <li><h3>The student's choices</h3><p>A model the student has pinned is used as is. Otherwise the router stays within their chosen provider, their quality setting and their spending limit.</p></li>
     <li><h3>What the task needs</h3><p>Each task declares what it requires, such as reading images, reading PDFs, structured output, long documents or keeping data on the computer. Models that cannot do the job are filtered out.</p></li>
     <li><h3>Best fit, then cost</h3><p>Among the models left, it scores quality for that kind of work and moves up a tier only for harder material, such as difficult questions or answers that must be graded precisely.</p></li>
-    <li><h3>Clear when it falls short</h3><p>If none of the available models meets every requirement, it uses the closest match and tells the student plainly, including what would fix it. It does not fail silently.</p></li>
+    <li><h3>A plain message when no model fits</h3><p>If none of the available models meets every requirement, it uses the closest match and tells the student plainly, including what would fix it. It does not fail silently.</p></li>
   </ol>
   <p class="note">The routing decision is a pure function: the same inputs always give the same answer, without side effects, so every rule can be tested directly. Adding a new provider means registering it, not changing the router.</p>
   <div class="grid two after">
@@ -200,7 +200,7 @@
   <details class="dd">
     <summary><span class="dd-t">The question generator</span><span class="dd-s">Seven stages, four rejection gates, benchmarked against 13 published and commercial systems.</span></summary>
     <div class="dd-body">
-<p class="intro">Generated questions are only useful if they are right. The generator is a pipeline of seven stages, using several AI models and code checks, each with one job. Four of the stages can reject a question, and anything that fails is discarded rather than patched.</p>
+<p class="intro">The generator is a pipeline of seven stages, using several AI models and code checks, each with one job. Four of the stages can reject a question, and anything that fails is discarded rather than patched.</p>
   <ol class="steps seven">
     <li><h3>Source first</h3><p>Every question starts from one section of a real text: OpenStax for the sciences, published works for reading passages.</p></li>
     <li><h3>Blueprint</h3><p>The question is planned before it is written: the skill it tests, the reasoning it needs, and the specific mistake each wrong answer is built to catch.</p></li>
@@ -223,20 +223,20 @@
     <article class="card pad"><h3>Simulated students</h3><p>Simulated students study for a week, a month, a year and several years, on the real encrypted database. They miss days, move their exam date, import decks and rest, and the app is checked every simulated day. One run loads 100,000 cards to test scale.</p></article>
     <article class="card pad"><h3>The real app, day by day</h3><p>Automated tests open the real desktop app and study through it for weeks at a time with a controlled clock, then compare the app's plan against an independent calculation every day.</p></article>
     <article class="card pad"><h3>Rules about the plan</h3><p>Property tests state rules the planner must always keep, then check them across many randomly generated study histories with missed days, rest days and exam date changes.</p></article>
-    <article class="card pad"><h3>Proof, not promises</h3><p>A task can only be marked done with a signed record that its tests ran. The system re-runs that command itself, and blocks any commit made with code newer than the last passing test run.</p></article>
-    <article class="card pad"><h3>Wording rules, enforced</h3><p>The app's writing rules are checked automatically by the test suite: plain everyday words, without internal jargon, dashes or trailing dots. A screen that breaks them fails the tests.</p></article>
-    <article class="card pad"><h3>Credit where it is due</h3><p>Every textbook figure carries its source and licence on the card. A licence audit checked the terms shown across the app.</p></article>
+    <article class="card pad"><h3>Signed test records for finished tasks</h3><p>A task can only be marked done with a signed record that its tests ran. The system re-runs that command itself, and blocks any commit made with code newer than the last passing test run.</p></article>
+    <article class="card pad"><h3>Automated checks on app wording</h3><p>The app's writing rules are checked automatically by the test suite: plain everyday words, without internal jargon, dashes or trailing dots. A screen that breaks them fails the tests.</p></article>
+    <article class="card pad"><h3>Source and licence credits</h3><p>Every textbook figure carries its source and licence on the card. A licence audit checked the terms shown across the app.</p></article>
   </div>
     </div>
   </details>
   <details class="dd">
     <summary><span class="dd-t">Iteration in practice</span><span class="dd-s">The flashcard generator before and after, and how the plan was proved over months.</span></summary>
     <div class="dd-body">
-<p class="intro">Every major part was iterated and re-tested until it measured up. The flashcard generator is a good example: the previous version's cards were thin, so it was rebuilt and tested again, blind.</p>
+<p class="intro">The flashcard generator is one example of how each major part was iterated and re-tested until it measured up. The previous version's cards were thin, so it was rebuilt and tested again, blind.</p>
 <div class="grid two">
     <article class="card pad">
       <h3>Flashcard generator, previous version against current</h3>
-      <p class="sub">Same blind test, same six topics.</p>
+      <p class="sub">Both versions were scored in the same blind test on the same six topics.</p>
       <table class="scores">
         <thead><tr><th scope="col"></th><th scope="col">Current</th><th scope="col">Previous version</th></tr></thead>
         <tbody>
@@ -248,7 +248,7 @@
       </table>
     </article>
     <article class="card pad">
-      <h3>The plan, proved over months</h3>
+      <h3>Long-run tests of the plan</h3>
       <ul class="plain">
         <li>Simulated students run from one week to several years on the real encrypted database.</li>
         <li>The real app is driven through weeks of study, and its plan is compared every day with an independent calculation.</li>
@@ -264,7 +264,7 @@
 <section class="wrap block" id="role">
   <h2>My role</h2>
   <div class="card pad role">
-    <p>I lead the product. I define the requirements and quality standards, design the interface, and test every release. My biochemistry degree lets me verify the science content directly.</p>
+    <p>I lead the product, which means I define the requirements and quality standards, design the interface, and test every release. My biochemistry degree lets me verify the science content directly.</p>
     <p>I treat AI coding agents as capable but untrusted. They write fast, and they can also hallucinate, so nothing they produce is believed until a test proves it. Over the past year I built a harness around that idea. Every task starts as a written contract, with a test designed to fail on bad work. The agents, Claude Code and OpenAI Codex, write code in isolated branches, and a second agent, blind to the first, tries to break the result. Nothing merges until the Node unit tests and the end-to-end tests pass again and leave a record that they ran. At the key gates, I run the app myself and sign off.</p>
   </div>
 </section>
