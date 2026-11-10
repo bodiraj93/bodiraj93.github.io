@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skopos deep dive: the harness, the generator, the scheduler, the data and the tests | Bodi Raj</title>
+<meta name="description" content="How Skopos is built and checked: the zero-trust harness, the question generator, FSRS scheduling, encryption and the test suite, with the real numbers.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://bodiraj93.github.io/skopos-deep-dive.html">
+<meta property="og:title" content="Skopos deep dive: how it is built and checked">
+<meta property="og:description" content="The zero-trust harness, the question generator, FSRS scheduling, encryption and the test suite, with the real numbers.">
+<meta property="og:image" content="https://bodiraj93.github.io/og.jpg">
+<link rel="canonical" href="https://bodiraj93.github.io/skopos-deep-dive.html">
+<link rel="stylesheet" href="site.css?v=6">
+<style>
+/* Page parts built from the site tokens in site.css */
+.flow { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 28px; }
+.flow li { position: relative; flex: 1 1 100px; background: var(--bg1); border-radius: var(--r-xl); box-shadow: var(--shadow4); padding: 12px 14px; font-size: 14px; line-height: 20px; color: var(--fg2); }
+.flow li b { display: block; color: var(--fg1); font-weight: 600; }
+.flow li.gate { border-top: 3px solid var(--brand); }
+.flow li:not(:last-child)::after { content: ""; position: absolute; right: -19px; top: 50%; width: 10px; height: 10px; border-top: 2px solid var(--fg3); border-right: 2px solid var(--fg3); transform: translateY(-50%) rotate(45deg); }
+.legend { margin: -12px 0 24px; color: var(--fg3); font-size: 14px; line-height: 20px; }
+.legend i { display: inline-block; width: 18px; height: 3px; background: var(--brand); vertical-align: middle; margin-right: 6px; }
+pre.code { margin: 8px 0 0; padding: 12px 14px; background: var(--bg3); border-radius: var(--r-m); overflow-x: auto; font: 13px/19px Consolas, "Cascadia Mono", Menlo, monospace; color: var(--fg1); white-space: pre-wrap; word-break: break-word; }
+.cite { color: var(--fg3); font-size: 13px; line-height: 18px; }
+.cite code, .grid p code, .plain code, .intro code, .walk code, .panel code { font: 13px Consolas, "Cascadia Mono", Menlo, monospace; }
+.walk { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: w; }
+.walk > li { counter-increment: w; background: var(--bg1); border-radius: var(--r-xl); box-shadow: var(--shadow4); padding: 20px 24px; }
+.walk > li h3::before { content: counter(w) ". "; color: var(--brand-fg); }
+.walk > li p { color: var(--fg2); }
+.walk > li .tag { display: inline-block; margin-bottom: 8px; padding: 2px 10px; border-radius: 999px; background: var(--brand-bg2); color: var(--brand-fg); font: 600 12px/18px var(--font); }
+.js .walk > li[hidden] { display: none; }
+.js .walk > li h3::before { content: none; }
+.controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.controls .count { margin-left: 4px; color: var(--fg3); font-size: 14px; }
+button.btn { border: 0; cursor: pointer; }
+button.btn[disabled] { opacity: .45; cursor: default; }
+.dots { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 12px; padding: 0; list-style: none; }
+.dots button { all: unset; cursor: pointer; padding: 4px 10px; border-radius: 999px; background: var(--bg1); box-shadow: 0 0 2px var(--sh-a), 0 1px 2px var(--sh-k); font: 600 13px/18px var(--font); color: var(--fg2); }
+.dots button[aria-current="step"] { background: var(--brand); color: #fff; }
+.dots button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.explorer { display: none; }
+.js .explorer { display: block; }
+.grades { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.grades button { min-width: 88px; }
+.grades button[aria-pressed="true"] { outline: 2px solid var(--brand-fg); outline-offset: 2px; }
+.readout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 12px 0 0; padding: 0; list-style: none; }
+.readout li { background: var(--bg2); border-radius: var(--r-xl); padding: 12px 14px; font-size: 14px; line-height: 20px; color: var(--fg2); }
+.readout strong { display: block; font: 600 24px/32px var(--display); color: var(--brand-fg); }
+.scroll { overflow-x: auto; }
+.scores.walktable td { white-space: nowrap; }
+.scores.walktable td:nth-child(2) { font-weight: 400; color: var(--fg2); }
+.scores tr.on { background: var(--brand-bg2); }
+.pipe { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.pipe li { position: relative; }
+.pipe li:not(:last-child)::after { content: ""; position: absolute; right: -15px; top: 50%; width: 8px; height: 8px; border-top: 2px solid var(--fg3); border-right: 2px solid var(--fg3); transform: translateY(-50%) rotate(45deg); }
+.pipe button { all: unset; cursor: pointer; display: block; padding: 8px 14px; border-radius: var(--r-m); background: var(--bg1); box-shadow: var(--shadow4); font: 600 14px/20px var(--font); color: var(--fg1); }
+.pipe button.gate { border-top: 3px solid var(--brand); }
+.pipe button[aria-expanded="true"] { background: var(--brand); color: #fff; }
+.pipe button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.nojs-pipe { display: block; }
+.js .nojs-pipe { display: none; }
+.pipe { display: none; }
+.js .pipe { display: flex; }
+.panels { display: grid; gap: 12px; }
+.js .panels .panel[hidden] { display: none; }
+.panel h3 .kind { margin-left: 8px; color: var(--fg3); font-weight: 400; font-size: 14px; }
+.panel .eg { margin-top: 12px; padding: 12px 14px; border-left: 3px solid var(--brand); background: var(--bg2); border-radius: 0 var(--r-m) var(--r-m) 0; }
+.panel .eg p { margin: 0; }
+.panel .eg b { color: var(--fg1); }
+.catches li { margin-bottom: 12px; }
+@media (max-width: 960px) { .readout { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .flow li:not(:last-child)::after { display: none; } .pipe li::after { display: none; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-row">
+    <a class="name" href="index.html">Bodi Raj</a>
+    <nav aria-label="Site">
+      <a href="index.html">Case study</a>
+      <a href="vehicles.html">Vehicle work</a>
+      <a href="mailto:bodiraj93@gmail.com">Email</a>
+      <a href="https://www.linkedin.com/in/bodi-raj/">LinkedIn</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero wrap">
+  <p class="eyebrow">Skopos deep dive, numbers dated 2026-11-09</p>
+  <h1>How Skopos is built, and how I know it works</h1>
+  <p class="lede">Skopos is a free MCAT study app in development for Windows and Mac. AI coding agents wrote its code, under written contracts and tests I set. This page shows the machinery: the harness that checks the agents, the question generator, the scheduler maths, how study data is protected, and the test suite. Every number here comes from my project handbook, which was checked against the code on 2026-11-09, or straight from the code and the plan records.</p>
+  <p class="note"><a href="index.html">Back to the case study</a></p>
+</section>
+
+<nav class="jump wrap" aria-label="On this page">
+  <a href="#harness">The harness</a><a href="#generator">The generator</a><a href="#scheduler">Planner and FSRS</a><a href="#data">Data and encryption</a><a href="#testing">Testing by the numbers</a>
+</nav>
+
+<!-- 1. HARNESS -->
+<section class="wrap block" id="harness">
+  <h2>1. The zero-trust harness</h2>
+  <p class="intro">AI coding agents are capable but untrusted. They write real code fast, and they also report a test as passing when it never ran, or fix a different bug than the one asked, with full confidence. So in this harness an agent saying "done, tests pass" counts as a guess until something other than the agent proves it.</p>
+
+  <ol class="flow" aria-label="The path of one task">
+    <li><b>Contract</b>Why, what, the bar for done, the files allowed</li>
+    <li class="gate"><b>Failing test</b>Red on the old code first</li>
+    <li><b>Builder</b>Its own branch and folder</li>
+    <li class="gate"><b>Receipt</b>Written by a script, not the agent</li>
+    <li class="gate"><b>Blind verifier</b>Tries to break it, HOLDS or FAILS</li>
+    <li class="gate"><b>Done gate</b>Refuses without receipt and verdict</li>
+    <li class="gate"><b>Merge gate</b>Reruns tests on the merged code</li>
+    <li><b>My own run</b>I use the app at key gates</li>
+  </ol>
+  <p class="legend"><i aria-hidden="true"></i>A blue top edge marks a step that can refuse the work.</p>
+
+  <h3>Follow one real task: VAULT-LEGACY, 2026-11-09</h3>
+  <p class="sub">The steps below are the task record in the project plan, quoted where the words matter. Use Next and Back, or pick a step.</p>
+  <div class="stepper" data-stepper>
+    <ol class="walk">
+      <li id="walk-1"><span class="tag">Found</span><h3>A gap turns up while I write the handbook</h3><p>Writing the chapter on architecture, I found that after the move into the encrypted vault, the cleanup removed only two kinds of temporary file. The task record says the cleanup "removes only .pre-sqlcipher- and .backup.json files", so study data could stay on disk unencrypted. A blind verifier confirmed it.</p></li>
+      <li id="walk-2"><span class="tag">Contract</span><h3>The task gets a written contract</h3><p>The bar for done, word for word from the plan:</p><pre class="code">a new unit or e2e test fails on trunk (plain Skopos_Data.json still present after a migrated boot) and passes after the fix</pre><p>The write scope lists five paths: <code>main.js</code>, <code>src/main/storageAdapter.js</code>, <code>tests/unit/</code> and two project maps. The instruction also fences off one decision: "Do not change sandbox settings (a decision for later, record it)."</p></li>
+      <li id="walk-3"><span class="tag">Verifier finds more</span><h3>The scope widens, on the record</h3><p>Before the fix landed, a blind verifier found that the gap was bigger: "up to 5 plain .bak copies held student text after a verified open", and "one safe-mode boot pins json for good". The task was widened by a recorded decision, because "plain student data on disk defeats the encryption".</p></li>
+      <li id="walk-4"><span class="tag">Failing test</span><h3>The test is red before the fix</h3><p><code>tests/unit/vaultLegacyPlainJson.test.js</code> holds four cases. Run against the trunk, three of the four fail, each on plain student text left on disk. That proves the test can see the problem.</p></li>
+      <li id="walk-5"><span class="tag">Builder</span><h3>The fix, on its own branch</h3><p>The builder worked on the branch <code>lane/vault-legacy</code>. A new function, <code>removePlainCopies</code>, deletes the plain data file, its old names and every <code>.bak</code> copy, but only while the vault is the verified live store. In safe mode, where the plain file is the data, it touches nothing. A profile stuck in safe mode now tries the vault again on the next boot.</p></li>
+      <li id="walk-6"><span class="tag">Receipt</span><h3>A script records the run</h3><p>The receipt <code>.claude/receipts/VAULT-LEGACY.json</code>, in part:</p><pre class="code">"label": "VAULT-LEGACY",
+"exitCode": 0,
+"durationMs": 9228,
+"git": { "head": "61214dfae240...", "branch": "lane/vault-legacy" },
+"scopeFiles": { "src/main/storageAdapter.js": "3e05f37d145a939a...", ... }</pre><p>It stores the real exit code, the commit and a SHA-256 fingerprint of each file in scope. If any of those files changes afterwards, the receipt stops confirming.</p></li>
+      <li id="walk-7"><span class="tag">Verifier HOLDS</span><h3>The blind verifier signs off</h3><p>Its one-line verdict, as stored in the plan, opens:</p><pre class="code">HOLDS tests/unit/vaultLegacyPlainJson.test.js 4/4 on branch, 3/4 fail on flow-build on plain student text left on disk</pre><p>It goes on to record a probe it ran itself: with a wrong key or a corrupt vault the plain files are kept, and with the good key only the encrypted vault is left. The sandbox setting was unchanged, as the contract required, and the receipt confirmed with 60 tests passing.</p></li>
+      <li id="walk-8"><span class="tag">Merge</span><h3>Merged into the trunk</h3><p>The branch reached the trunk <code>flow-build</code> in merge commit <code>27c4773eb</code>. After the merge, the vault test and the save test ran together: 8 tests, 8 passed, 0 failed.</p></li>
+    </ol>
+  </div>
+
+  <div class="grid two after">
+    <article class="card pad"><h3>Written contracts</h3><p>A script generates each contract from the plan. About 163 contract files existed on 2026-11-09. Each one says why the task exists, what to do, the bar for done, the only files the agent may touch, and what is not its call. If the fix needs another file, the agent stops and reports.</p></article>
+    <article class="card pad"><h3>Tests built to fail first</h3><p>The bar names a test that must be red on the old code. A test that passes before and after the change proves nothing. Builders may not edit a failing behaviour test to make it pass. The one exception is a declared golden file rebuild, and then the builder must say which values moved and why.</p></article>
+    <article class="card pad"><h3>Isolated branches</h3><p>Each task runs on a branch named <code>lane/</code> plus a name, usually in its own worktree folder, so one agent cannot break the tests of another with half-done work. On 2026-11-09 there were about 142 worktrees and about 181 lane branches on GitHub.</p></article>
+    <article class="card pad"><h3>The blind verifier</h3><p>A second agent reads only three things: the diff, the receipt and the bar set for the task. It never reads the reasoning of the builder. It reruns the commands, puts the old code back to check the test goes red, checks no test was weakened, and changes nothing. A FAILS needs evidence, a command that exits non-zero or a file and line. The reply is one line, HOLDS or FAILS.</p></article>
+    <article class="card pad"><h3>Receipts, and the day one was faked</h3><p>A receipt records the command, its real exit code, the counts, the Git commit and a SHA-256 hash of every file in scope, and the check reruns the command. On 2026-10-05 an audit replaced the receipt script with a two-line fake that always printed ok, and a task got marked done. Now the receipt script has its own fingerprint, signed and kept inside the <code>.git</code> folder, and the plan checks it before believing any verdict.</p></article>
+    <article class="card pad"><h3>The done gate and the merge gate</h3><p><code>state.js done</code> refuses a task without a receipt, without a named verifier, or without a one-line verdict that starts with HOLDS. Then it checks the receipt is signed and still passes. The merge script reruns the unit tests the branch changed on the merged code, rebuilds the app when its source changed, and rechecks the receipt there. If the branch changed a test it did not run, the answer is INCOMPLETE, never GREEN.</p></article>
+  </div>
+
+  <article class="card pad feature after">
+    <h3>The command guard</h3>
+    <p>A small script checks every shell command an agent is about to run. I called it directly on 2026-11-09. Its answers, shortened:</p>
+    <pre class="code">"git add -A"           =&gt; refused: stage explicit paths
+"git push --force"     =&gt; refused: never force-push
+"npx playwright test"  =&gt; refused: use the repo script, which takes the app lock and rebuilds
+"git add scripts/a.js" =&gt; allowed</pre>
+    <p>It also has limits I tested the same day. Staging a whole folder by name is allowed. A banned command inside quotes is allowed, because quoted text is treated as data so a commit message cannot trip it. Running Playwright by its file path is allowed. It is a seatbelt for honest mistakes, not a wall against an agent trying to get round it. The receipts and the verifier are the deeper checks.</p>
+  </article>
+
+  <h3 class="gap">Real catches, the week of 2026-11-09</h3>
+  <ul class="plain catches">
+    <li><strong>A count that was one off.</strong> I wrote that <code>tests/unit</code> had 1,391 files and 421 receipts were committed. The verifier counted again and got 1,392 and 422, because my own commit had added a test file and a receipt after I counted. Counts became "about", with the date.</li>
+    <li><strong>A clock claim that was backwards.</strong> I wrote that the test clock "runs a fixed amount behind" to reach Monday. The verifier pointed at <code>tests/e2e/helpers/pinnedClock.js:4</code>, which says the pin moves the clock ahead, never behind. The receipt was green both times. Only the blind reader caught the words.</li>
+    <li><strong>A cascade nobody enforced.</strong> The database schema declares that deleting a deck deletes its notes, but the setting that makes SQLite enforce it is never switched on. Found while the handbook chapter on data was verified. Task SAVE-GAP chose to keep the deletes in code, label the schema clauses "dead by design", and add a test that deleting a deck leaves no orphan rows.</li>
+    <li><strong>A missed network path.</strong> My first privacy search looked only for <code>fetch(</code>. The verifier caught calls made through a renamed function, <code>fetchImpl(</code>: the calls that ask each AI provider for its model list. I reran a broader search and read every hit.</li>
+    <li><strong>A test change put on the record.</strong> The SAVE-GAP fix made one assertion in an older test untrue: it checked that the old file was gone, and now the old file is kept aside. The change was not made quietly. It was written into the plan as a decision with its reason, and the verifier confirmed that only that one line changed.</li>
+  </ul>
+
+  <article class="card pad diff after">
+    <h3>Honest limits</h3>
+    <p>Model output is not deterministic. The same prompt can give different code. The gates are deterministic: the same files and the same command give the same verdict, and the same shell command gets the same refusal. Some guards, like the command guard, run as Claude Code hooks, while the rules, the checks, the receipts and the plan are my own scripts. The builder and the verifier are both AI models and can share a blind spot. The merge reruns the changed tests, not the whole suite. There is no CI on every push yet, so a receipt proves a test passed on this one machine. About 54 done tasks are marked "legacy", finished before the verifier rule existed. And my own runs of the app are not yet recorded in the plan.</p>
+  </article>
+</section>
+
+<!-- 2. GENERATOR -->
+<section class="wrap block" id="generator">
+  <h2>2. The question generator</h2>
+  <p class="intro">Language models write the questions, and other models and code check them. The pipeline is called BWV, for Blueprint, Writer, Verifier. A question that fails any step is dropped with a named reason, and the questions written alongside it carry on. Select a stage to see what it checks and a real case from the records.</p>
+
+  <ol class="pipe" aria-label="Pipeline stages">
+    <li><button type="button" aria-controls="st-plan">Plan</button></li>
+    <li><button type="button" aria-controls="st-write">Write</button></li>
+    <li><button type="button" class="gate" aria-controls="st-lint">Lint and maths</button></li>
+    <li><button type="button" class="gate" aria-controls="st-solve">Solve</button></li>
+    <li><button type="button" aria-controls="st-lure">Lure</button></li>
+    <li><button type="button" class="gate" aria-controls="st-gates">Gates</button></li>
+    <li><button type="button" class="gate" aria-controls="st-ground">Grounding</button></li>
+    <li><button type="button" class="gate" aria-controls="st-land">Land</button></li>
+  </ol>
+  <p class="legend nojs-pipe">Plan, Write, Lint and maths, Solve, Lure, Gates, Grounding, Land. Each stage is shown below.</p>
+
+  <div class="panels">
+    <article class="card pad panel" id="st-plan"><h3>Plan<span class="kind">a model</span></h3><p>One call plans a batch of blueprints: what each question asserts, the operation, the key claim, the steps, and three real misconceptions to turn into wrong choices. Each blueprint is also told which letter its key goes at, rotating through A to D.</p><div class="eg"><p><b>From the BB-R25 run log:</b> "planned 6 · written 10 · lint-failed 1 · solver-verified 4 · grounded 4 · landed 4". Ten drafts gave four questions.</p></div></article>
+    <article class="card pad panel" id="st-write"><h3>Write<span class="kind">a model</span></h3><p>One call per blueprint writes the question from a gold example and cites the span of the source that supports the answer. For CARS, the reading section, the writer does not write the passage. CARS passages are real excerpts, word for word, credited to their authors, and the writer gets the passage as fixed text and writes only the questions. Science passages are written from a real source and may invent an experiment, never a fact the source does not state.</p><div class="eg"><p><b>Why CARS changed:</b> in a blind rating on 2026-11-01, the rater spotted all 12 model-written CARS passages as purpose-written. As of 2026-11-07, every landed CARS passage is from open-access humanities essays in the Open Library of Humanities and PubMed Central.</p></div></article>
+    <article class="card pad panel" id="st-lint"><h3>Lint and maths<span class="kind">code</span></h3><p>Code, not a model, checks each draft: duplicate wrong choices, text the app cannot print, and a numeric answer that does not match its own formula. For a numeric key, the writer must hand over the formula. A small parser computes it, with no <code>eval</code> and only a fixed list of functions and constants. It refuses any number the question never gave, requires the key to match at its own significant figures and sign, and requires that no wrong choice also matches.</p><div class="eg"><p><b>The case behind it:</b> a paid judge model caught a wrong key on some reads and missed it on others: "approximately 6.66 m/s" where the square root of 44.28 is 6.654, and +8.82 J where the work is negative. When I ran the check on a test item, "6.65 m/s" failed as <code>key_computation_mismatch</code>, and a formula using 3.1, a number the stem never gave, failed as <code>key_computation_foreign_number</code>.</p></div></article>
+    <article class="card pad panel" id="st-solve"><h3>Solve<span class="kind">a second model</span></h3><p>A different model answers with the source open, like a strong student. It looks for a second defensible answer, two choices that say the same thing, or a stem that gives the answer away. In strict mode, a solver confidence under 0.75 drops the question.</p><div class="eg"><p><b>In the BB-R25 batch:</b> of 10 drafts, 1 failed the lint and 4 were verified by the solver. The rest did not go on.</p></div></article>
+    <article class="card pad panel" id="st-lure"><h3>Lure<span class="kind">a small model, recorded</span></h3><p>A small, cheap model answers with the book closed, like a novice. Which wrong choice tempts it is recorded on the question. This stage measures and does not reject, except in one catalogue path. Where its answer is used as a gate, it is asked twice with the choices rotated, so its own favourite letter cannot decide.</p><div class="eg"><p><b>Real case:</b> this stage drops nothing in the main path, so the records hold measurements, not rejections.</p></div></article>
+    <article class="card pad panel" id="st-gates"><h3>Gates<span class="kind">code, then a judge</span></h3><p>Code checks again, then a judge model scores the question against the item standard. A failure is dropped with its reason.</p><div class="eg"><p><b>A lesson from the code:</b> the header of the gates file said it was "called by nothing yet". That comment was stale. The pipeline calls it in two places. Trust what the code does, not what a comment says.</p></div></article>
+    <article class="card pad panel" id="st-ground"><h3>Grounding<span class="kind">code, then a verifier</span></h3><p>Code looks for the cited quote in the source. An exact match passes. Otherwise at least 80 percent of its words must appear in one window of the source the same length. A verifier model then says whether the line supports the answer: yes passes, partial fails. If the source also supports a wrong choice, the question fails as <code>distractor_supported</code>. In CARS no outside fact is allowed at all.</p><div class="eg"><p><b>A threshold set by measurement:</b> for CARS, the content words of the key must match one passage sentence at a share of 0.9 or more. The code records that 0.8 failed a real AAMC question and 0.9 failed none, measured on 53 AAMC CARS items.</p></div></article>
+    <article class="card pad panel" id="st-land"><h3>Land<span class="kind">code</span></h3><p>Only now is the question saved, and only now are its choices rotated by a random amount, with the key and each "why wrong" note moving with their own text. Number choices keep rising order, like the exam. A question whose explanation still names the old letter, such as "The answer is C" after the key moved to A, is dropped as <code>letter_mismatch</code>.</p><div class="eg"><p><b>What it gives:</b> across 2,109 landed questions counted on 2026-11-09, the key was A 503 (23.9%), B 573 (27.2%), C 555 (26.3%) and D 478 (22.7%). Close to a quarter each, not exact.</p></div></article>
+  </div>
+
+  <div class="grid two after">
+    <article class="card pad">
+      <h3>Blind rating, round BB-R25</h3>
+      <p class="sub">One AI rater, run twice independently on the same sheet of 51 items: 11 from Skopos, 20 AAMC, and 5 free samples each from Blueprint, Kaplan, Princeton Review and UWorld. Sources hidden, scored 1 to 5. No human rated these items.</p>
+      <table class="scores">
+        <thead><tr><th scope="col">Axis</th><th scope="col">Skopos (a / b)</th><th scope="col">UWorld (a / b)</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Real skill</th><td>4.91 / 4.91</td><td>5.00 / 5.00</td></tr>
+          <tr><th scope="row">Key and distractors</th><td>4.73 / 4.73</td><td>4.60 / 5.00</td></tr>
+          <tr><th scope="row">A miss teaches</th><td>4.91 / 4.82</td><td>4.20 / 4.00</td></tr>
+          <tr><th scope="row">Difficulty</th><td>4.64 / 4.64</td><td>4.80 / 4.80</td></tr>
+          <tr><th scope="row">Format</th><td>5.00 / 4.91</td><td>5.00 / 5.00</td></tr>
+          <tr><th scope="row">Overall</th><td>4.84 / 4.80</td><td>4.72 / 4.76</td></tr>
+        </tbody>
+      </table>
+    </article>
+    <article class="card pad">
+      <h3>What 4.87 against 4.10 means</h3>
+      <ul class="plain">
+        <li>It is the mean of the two runs on "a miss teaches", the explanation axis: 4.91 and 4.82 for Skopos, 4.20 and 4.00 for the UWorld free samples.</li>
+        <li>The samples are small, 11 items against 5. One item moves a mean a lot.</li>
+        <li>The UWorld items are its free public samples, not its paid bank.</li>
+        <li>On difficulty, Skopos scored lower than UWorld in both runs.</li>
+        <li>The rater guessed all 11 Skopos items as AI-written, in both runs.</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<!-- 3. SCHEDULER -->
+<section class="wrap block" id="scheduler">
+  <h2>3. The planner and FSRS</h2>
+  <p class="intro">The plan is derived, not stored. <code>deriveRoad()</code> is a pure function of the exam date, the minutes a day, the study days and the work already done, so a missed day or a moved exam recomputes the whole plan. Only the choices the student makes, such as a booked day off, are saved. Reviews are scheduled by FSRS through the open-source ts-fsrs library, version 5.3.2, with FSRS-6 and its 21 weights. One module owns it, and it is pure: it takes a card and a grade and returns the new card.</p>
+
+  <div class="grid three">
+    <article class="card pad"><h3>Stability</h3><p>How many days the memory lasts before the chance of recall falls to 90 percent. A bigger number is a stronger memory.</p></article>
+    <article class="card pad"><h3>Difficulty</h3><p>How hard this card is for this student, from 1 to 10.</p></article>
+    <article class="card pad"><h3>Retention target 0.9</h3><p>The scheduler aims for a 9 in 10 chance of recall on each due date. Skopos keeps the ts-fsrs default, read from the live engine on 2026-11-09, with interval fuzz off, so the same review always gives the same date.</p></article>
+  </div>
+
+  <article class="card pad after" id="fsrs-explorer">
+    <h3>Grade a question yourself</h3>
+    <p class="sub">A new practice question, reviewed on each due date. Every number below was computed by the scheduler inside the app, <code>src/main/fsrsEngine.js</code>, with its question settings and default parameters. Nothing is estimated in the browser.</p>
+    <div class="explorer" aria-live="polite">
+      <p><strong data-x="title">Review 1, a new question</strong><br><span class="sub" data-x="state"></span></p>
+      <div class="grades" role="group" aria-label="Grade this review">
+        <button type="button" class="btn subtle" data-grade="again">Again</button>
+        <button type="button" class="btn subtle" data-grade="hard">Hard</button>
+        <button type="button" class="btn subtle" data-grade="good">Good</button>
+        <button type="button" class="btn subtle" data-grade="easy">Easy</button>
+      </div>
+      <ul class="readout">
+        <li><strong data-x="days">?</strong>days to the next review</li>
+        <li><strong data-x="stab">?</strong>stability, in days</li>
+        <li><strong data-x="diff">?</strong>difficulty, 1 to 10</li>
+        <li><strong data-x="lapses">?</strong>lapses</li>
+      </ul>
+      <p class="note" data-x="note">Pick a grade to see what the scheduler does.</p>
+      <div class="controls">
+        <button type="button" class="btn" data-act="next">Pass this review with Good</button>
+        <button type="button" class="btn subtle" data-act="reset">Start over</button>
+      </div>
+    </div>
+    <div class="scroll gap">
+      <table class="scores walktable">
+        <caption class="sub" style="text-align:left;caption-side:top;padding-bottom:4px">Every grade at every review on the Good path (d is days, S is stability, D is difficulty)</caption>
+        <thead><tr><th scope="col">Review</th><th scope="col">Stability before</th><th scope="col">Recall on the due date</th><th scope="col">Again</th><th scope="col">Hard</th><th scope="col">Good</th><th scope="col">Easy</th></tr></thead>
+        <tbody>
+<tr><th scope="row">1</th><td>new</td><td></td><td>1 d<br><span class="sub">S 0.21, D 6.41</span></td><td>2 d<br><span class="sub">S 1.29, D 5.11</span></td><td>3 d<br><span class="sub">S 2.31, D 2.12</span></td><td>8 d<br><span class="sub">S 8.30, D 1.00</span></td></tr>
+<tr><th scope="row">2</th><td>2.31</td><td>0.881</td><td>1 d<br><span class="sub">S 0.64, D 7.39</span></td><td>9 d<br><span class="sub">S 9.23, D 4.75</span></td><td>14 d<br><span class="sub">S 13.83, D 2.11</span></td><td>24 d<br><span class="sub">S 23.88, D 1.00</span></td></tr>
+<tr><th scope="row">3</th><td>13.83</td><td>0.899</td><td>2 d<br><span class="sub">S 1.73, D 7.39</span></td><td>40 d<br><span class="sub">S 39.77, D 4.75</span></td><td>57 d<br><span class="sub">S 56.96, D 2.10</span></td><td>95 d<br><span class="sub">S 94.60, D 1.00</span></td></tr>
+<tr><th scope="row">4</th><td>56.96</td><td>0.900</td><td>3 d<br><span class="sub">S 3.19, D 7.39</span></td><td>141 d<br><span class="sub">S 140.72, D 4.74</span></td><td>196 d<br><span class="sub">S 196.24, D 2.10</span></td><td>318 d<br><span class="sub">S 317.81, D 1.00</span></td></tr>
+<tr><th scope="row">5</th><td>196.24</td><td>0.900</td><td>5 d<br><span class="sub">S 5.03, D 7.39</span></td><td>431 d<br><span class="sub">S 430.93, D 4.74</span></td><td>586 d<br><span class="sub">S 586.48, D 2.09</span></td><td>927 d<br><span class="sub">S 927.13, D 1.00</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Read the Good column down: 3, 14, 57 and 196 days. Each gap is the stability rounded to whole days, which is the 90 percent target at work, and recall on the due dates comes out at 0.881, 0.899, 0.900 and 0.900. Now grade the fifth review Again: stability falls from 196.24 days to 5.03, difficulty rises from 2.10 to 7.39, and the next gap is 5 days. One forgotten review costs a lot, which is why undo restores the earlier card from the review log the scheduler keeps, never a guess.</p>
+  </article>
+  <script type="application/json" id="fsrs-data">[{"review":1,"before":{"stability":0,"difficulty":0,"reps":0,"retrievability":null},"out":{"again":{"stability":0.21,"difficulty":6.41,"days":1,"lapses":0},"hard":{"stability":1.29,"difficulty":5.11,"days":2,"lapses":0},"good":{"stability":2.31,"difficulty":2.12,"days":3,"lapses":0},"easy":{"stability":8.3,"difficulty":1,"days":8,"lapses":0}}},{"review":2,"before":{"stability":2.31,"difficulty":2.12,"reps":1,"retrievability":0.881},"out":{"again":{"stability":0.64,"difficulty":7.39,"days":1,"lapses":1},"hard":{"stability":9.23,"difficulty":4.75,"days":9,"lapses":0},"good":{"stability":13.83,"difficulty":2.11,"days":14,"lapses":0},"easy":{"stability":23.88,"difficulty":1,"days":24,"lapses":0}}},{"review":3,"before":{"stability":13.83,"difficulty":2.11,"reps":2,"retrievability":0.899},"out":{"again":{"stability":1.73,"difficulty":7.39,"days":2,"lapses":1},"hard":{"stability":39.77,"difficulty":4.75,"days":40,"lapses":0},"good":{"stability":56.96,"difficulty":2.1,"days":57,"lapses":0},"easy":{"stability":94.6,"difficulty":1,"days":95,"lapses":0}}},{"review":4,"before":{"stability":56.96,"difficulty":2.1,"reps":3,"retrievability":0.9},"out":{"again":{"stability":3.19,"difficulty":7.39,"days":3,"lapses":1},"hard":{"stability":140.72,"difficulty":4.74,"days":141,"lapses":0},"good":{"stability":196.24,"difficulty":2.1,"days":196,"lapses":0},"easy":{"stability":317.81,"difficulty":1,"days":318,"lapses":0}}},{"review":5,"before":{"stability":196.24,"difficulty":2.1,"reps":4,"retrievability":0.9},"out":{"again":{"stability":5.03,"difficulty":7.39,"days":5,"lapses":1},"hard":{"stability":430.93,"difficulty":4.74,"days":431,"lapses":0},"good":{"stability":586.48,"difficulty":2.09,"days":586,"lapses":0},"easy":{"stability":927.13,"difficulty":1,"days":927,"lapses":0}}}]</script>
+
+  <div class="grid two after">
+    <article class="card pad"><h3>Two schedulers, one parameter set</h3><p>A flashcard keeps short repeats inside one sitting, so a Good on a new card is back in ten minutes. A question does not, because the Today screen counts what is owed on a calendar day, and a question answered once used to show as due again the same day. The question scheduler is the same scheduler with short-term steps switched off and nothing else changed.</p></article>
+    <article class="card pad"><h3>A guard on imported settings</h3><p>ts-fsrs quietly swaps in its default weights for a vector of the wrong length and never throws. Without a check, the app would say imported Anki settings were active while it ran the defaults. The engine checks the values first and refuses anything out of range by name.</p></article>
+  </div>
+</section>
+
+<!-- 4. DATA -->
+<section class="wrap block" id="data">
+  <h2>4. Data and encryption</h2>
+  <p class="intro">Skopos does not have an account or a server. Study data is one SQLCipher database on the computer it runs on. SQLCipher is SQLite that encrypts the whole file.</p>
+  <div class="grid three">
+    <article class="card pad"><h3>The key</h3><p>A random 32-byte key is made on first run and stored through Electron safeStorage, which hands the job to the protected store of the operating system. If that store is not available, the key manager refuses to work. There is no plain-text fallback. AI provider keys and the phone pairing secret follow the same rule.</p></article>
+    <article class="card pad"><h3>The proof</h3><p>A plain SQLite file always starts with the words <code>SQLite format 3</code>. An end-to-end test boots the real app and fails if the database file starts that way. Opened with the plain SQLite library and no key, a vault made by the test simulation gives one answer: "file is not a database".</p></article>
+    <article class="card pad"><h3>If the vault will not open</h3><p>A boot guard restores the last good copy, runs in a safe mode and tells the student, rather than losing work. While safe mode lasts, the data is plain JSON on disk. That is a real gap, and it is written down.</p></article>
+  </div>
+
+  <article class="card pad feature after">
+    <h3>What leaves the machine</h3>
+    <p>I searched the app code for every network call and read each hit, on 2026-11-09. The list, in order of when it happens:</p>
+    <ol class="plain">
+      <li><strong>Every launch:</strong> two scripts load from public CDNs, JSZip and MathJax. Nothing in the app uses them. This is an open finding.</li>
+      <li><strong>60 seconds after start, packaged builds only:</strong> the update check asks GitHub Releases for a new version.</li>
+      <li><strong>When a student saves an AI key:</strong> the app asks that provider (Google, OpenAI, Anthropic or Groq) which models the key can use. That sends the key before any question is made. With no key saved, no call is made.</li>
+      <li><strong>When the student generates with that key:</strong> the prompt goes to the chosen provider, and it can include study text.</li>
+      <li><strong>When a phone is paired:</strong> messages pass through a relay, sealed with AES-256-GCM first, with keys from a secret that travels only in the QR code. The relay cannot open them.</li>
+      <li><strong>Links:</strong> only web links, opened in the system browser.</li>
+      <li><strong>Crash reports:</strong> nothing. Sending needs a yes and a project address, and the address is empty.</li>
+    </ol>
+    <p class="note">Not audited: the code inside installed libraries, and what Electron or the operating system sends by itself. A search finds only what its pattern names, so the next step is a test that fails when a new network call appears.</p>
+  </article>
+
+  <div class="grid two after">
+    <article class="card pad"><h3>Fixed this week: plain copies removed</h3><p>After the move into the vault, the old plain <code>Skopos_Data.json</code> and up to five plain <code>.bak</code> copies stayed beside the encrypted file. Since VAULT-LEGACY, merged on 2026-11-09, they are deleted once the vault opens and verifies, never in safe mode. The walk-through above follows this task.</p></article>
+    <article class="card pad"><h3>Fixed this week: a crash-safe save</h3><p>When Windows refused a rename, one save path deleted the old file before renaming the new one, so a crash in that instant left no data file. Since SAVE-GAP, merged on 2026-11-09, the old file is moved aside and never deleted, the next boot can load it, and the aside copy is removed once a save lands.</p></article>
+  </div>
+  <p class="note">Still open: the main window runs with context isolation on and Node integration off, but its sandbox is off. The two PDF helper windows are sandboxed.</p>
+</section>
+
+<!-- 5. TESTING -->
+<section class="wrap block" id="testing">
+  <h2>5. Testing by the numbers</h2>
+  <p class="sub">File counts taken on 2026-11-09 with <code>find</code>. A file holds many test cases.</p>
+  <ul class="facts" aria-label="Test counts">
+    <li><strong>About 1,390</strong><span>Node test files in tests/unit, plus 3 in tests/integration</span></li>
+    <li><strong>349</strong><span>React component test files, run by Vitest</span></li>
+    <li><strong>228</strong><span>Playwright specs that boot the real Electron app</span></li>
+    <li><strong>14</strong><span>golden masters, compared to 10 decimal places</span></li>
+  </ul>
+  <div class="grid three after">
+    <article class="card pad"><h3>A golden test that can fail</h3><p>The golden masters hold the full output of the plan and scheduling maths for fixed inputs. One test plants a change of 0.000000001 in a copy and proves the comparison catches it. A master is never rebuilt just to clear a red.</p></article>
+    <article class="card pad"><h3>Six months in two minutes</h3><p>A simulated student studies 180 days through the real save path and a real encrypted database, with Sundays off, a holiday, a three-week gap, a 400-review catch-up and 16 scripted chaos events. With seed 1: zero failures in 2 minutes 12 seconds, six practice exams sat.</p></article>
+    <article class="card pad"><h3>Three years, then a wipe</h3><p>A second simulated student uses the app for 1,095 days, then exports and resets. My run: 23 of 23 checks passed, a 4.8 MB export came back byte for byte with zero records lost. It saves weekly, not daily, to keep the run to five minutes.</p></article>
+    <article class="card pad"><h3>100,000 cards</h3><p>A scale run loads 100,000 cards and 4,000 questions into a 49.7 MB vault. The due scan took 41 ms, and the deck page draws at most 49 rows at any size. One open finding: the Progress activity chart took 600 ms against a 250 ms bound, because it reads all 332,643 raw study events.</p></article>
+    <article class="card pad"><h3>Checks that are proven to fail</h3><p>A 48-day soak runs with a fault planted in the save, which adds one to every review count. The test passes only if the soak goes red. A long green run means nothing until a broken run turns it red.</p></article>
+    <article class="card pad"><h3>What is not measured</h3><p>Skopos does not have code coverage reporting or CI on every push. The end-to-end specs are slow, three at a time. I would add both next.</p></article>
+  </div>
+</section>
+
+<section class="wrap block contact">
+  <p><a class="btn subtle" href="index.html">Back to the case study</a></p>
+</section>
+
+</main>
+
+<footer class="wrap foot"><p>Product site: <a href="https://skoposprep.com">skoposprep.com</a></p><p>Bodi Rajamanthri, Winnipeg | <a href="https://www.linkedin.com/in/bodi-raj/">LinkedIn</a> | <a href="mailto:bodiraj93@gmail.com">bodiraj93@gmail.com</a></p></footer>
+
+<script>
+(function () {
+  'use strict';
+  document.documentElement.classList.add('js');
+
+  // 1. Harness walk-through: one step at a time, Back and Next, or a step pill.
+  var stepper = document.querySelector('[data-stepper]');
+  if (stepper) {
+    var steps = Array.prototype.slice.call(stepper.querySelectorAll('.walk > li'));
+    var at = 0;
+    var dots = document.createElement('ol');
+    dots.className = 'dots';
+    dots.setAttribute('aria-label', 'Steps');
+    steps.forEach(function (li, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = (i + 1) + ' ' + li.querySelector('.tag').textContent;
+      b.addEventListener('click', function () { show(i, true); });
+      var item = document.createElement('li');
+      item.appendChild(b);
+      dots.appendChild(item);
+    });
+    var controls = document.createElement('div');
+    controls.className = 'controls';
+    controls.innerHTML = '<button type="button" class="btn subtle" data-go="-1">Back</button><button type="button" class="btn" data-go="1">Next</button><span class="count" aria-live="polite"></span>';
+    stepper.insertBefore(dots, stepper.firstChild);
+    stepper.appendChild(controls);
+    var back = controls.querySelector('[data-go="-1"]');
+    var next = controls.querySelector('[data-go="1"]');
+    var count = controls.querySelector('.count');
+    back.addEventListener('click', function () { show(at - 1, true); });
+    next.addEventListener('click', function () { show(at + 1, true); });
+    function show(i, focus) {
+      at = Math.min(Math.max(i, 0), steps.length - 1);
+      steps.forEach(function (li, j) { li.hidden = j !== at; });
+      Array.prototype.forEach.call(dots.querySelectorAll('button'), function (b, j) {
+        if (j === at) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      });
+      back.disabled = at === 0;
+      next.disabled = at === steps.length - 1;
+      count.textContent = 'Step ' + (at + 1) + ' of ' + steps.length;
+      if (focus) { var h = steps[at].querySelector('h3'); h.tabIndex = -1; h.focus({ preventScroll: true }); }
+    }
+    show(at, false);
+  }
+
+  // 2. FSRS explorer: numbers from the app scheduler, embedded as JSON (no maths here).
+  var box = document.getElementById('fsrs-explorer');
+  var data = JSON.parse(document.getElementById('fsrs-data').textContent);
+  if (box && data.length) {
+    var x = function (k) { return box.querySelector('[data-x="' + k + '"]'); };
+    var rows = box.querySelectorAll('.walktable tbody tr');
+    var GRADE = { again: 'Again', hard: 'Hard', good: 'Good', easy: 'Easy' };
+    var k = 0;
+    var picked = null;
+    var fmt = function (n) { return n.toFixed(2); };
+    function render() {
+      var s = data[k];
+      x('title').textContent = k === 0 ? 'Review 1, a new question' : 'Review ' + (k + 1) + ', on its due date';
+      x('state').textContent = k === 0 ? 'The card has not been graded yet.'
+        : 'Now: stability ' + fmt(s.before.stability) + ' days, difficulty ' + fmt(s.before.difficulty) + ', chance of recall today ' + s.before.retrievability.toFixed(3) + '.';
+      Array.prototype.forEach.call(box.querySelectorAll('[data-grade]'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.grade === picked)); });
+      Array.prototype.forEach.call(rows, function (r, i) { r.classList.toggle('on', i === k); });
+      var o = picked && s.out[picked];
+      x('days').textContent = o ? o.days : '?';
+      x('stab').textContent = o ? fmt(o.stability) : '?';
+      x('diff').textContent = o ? fmt(o.difficulty) : '?';
+      x('lapses').textContent = o ? o.lapses : '?';
+      x('note').textContent = !o ? 'Pick a grade to see what the scheduler does.'
+        : GRADE[picked] + ' brings it back in ' + o.days + (o.days === 1 ? ' day.' : ' days.')
+          + (k > 0 ? ' Stability goes from ' + fmt(s.before.stability) + ' to ' + fmt(o.stability) + ' days.' : '');
+      box.querySelector('[data-act="next"]').disabled = k === data.length - 1;
+    }
+    box.addEventListener('click', function (e) {
+      var g = e.target.closest('[data-grade]');
+      var a = e.target.closest('[data-act]');
+      if (g) picked = g.dataset.grade;
+      if (a && a.dataset.act === 'next') { k = Math.min(k + 1, data.length - 1); picked = null; }
+      if (a && a.dataset.act === 'reset') { k = 0; picked = null; }
+      if (g || a) render();
+    });
+    render();
+  }
+
+  // 3. Pipeline: one stage panel open at a time.
+  var pipe = document.querySelector('.pipe');
+  if (pipe) {
+    var buttons = Array.prototype.slice.call(pipe.querySelectorAll('button'));
+    var open = function (id) {
+      buttons.forEach(function (b) {
+        var on = b.getAttribute('aria-controls') === id;
+        b.setAttribute('aria-expanded', String(on));
+        document.getElementById(b.getAttribute('aria-controls')).hidden = !on;
+      });
+    };
+    buttons.forEach(function (b) { b.addEventListener('click', function () { open(b.getAttribute('aria-controls')); }); });
+    open('st-plan');
+  }
+})();
+</script>
+</body>
+</html>
