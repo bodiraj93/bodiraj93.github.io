@@ -3,75 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Skopos technical deep dive: harness, generator, scheduling, data and tests | Bodi Raj</title>
-<meta name="description" content="How Skopos is built and checked: the zero-trust harness, the question generator, FSRS scheduling, encryption and the test suite, with the real numbers.">
+<title>Skopos technical deep dive: how I designed and check the harness, generator, scheduling, data and tests | Bodi Raj</title>
+<meta name="description" content="How I designed Skopos and how my zero-trust harness checks it: the question generator, FSRS scheduling, encryption and the test suite, with the real numbers.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://bodiraj93.github.io/skopos-deep-dive.html">
-<meta property="og:title" content="Skopos deep dive: how it is built and checked">
+<meta property="og:title" content="Skopos deep dive: how I designed it and how I check it">
 <meta property="og:description" content="The zero-trust harness, the question generator, FSRS scheduling, encryption and the test suite, with the real numbers.">
 <meta property="og:image" content="https://bodiraj93.github.io/og.jpg">
 <link rel="canonical" href="https://bodiraj93.github.io/skopos-deep-dive.html">
-<link rel="stylesheet" href="site.css?v=7">
-<style>
-/* Page parts built from the site tokens in site.css */
-.flow { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 28px; }
-.flow li { position: relative; flex: 1 1 100px; background: var(--bg1); border-radius: var(--r-xl); box-shadow: var(--shadow4); padding: 12px 14px; font-size: 14px; line-height: 20px; color: var(--fg2); }
-.flow li b { display: block; color: var(--fg1); font-weight: 600; }
-.flow li.gate { border-top: 3px solid var(--brand); }
-.flow li:not(:last-child)::after { content: ""; position: absolute; right: -19px; top: 50%; width: 10px; height: 10px; border-top: 2px solid var(--fg3); border-right: 2px solid var(--fg3); transform: translateY(-50%) rotate(45deg); }
-.legend { margin: -12px 0 24px; color: var(--fg3); font-size: 14px; line-height: 20px; }
-.legend i { display: inline-block; width: 18px; height: 3px; background: var(--brand); vertical-align: middle; margin-right: 6px; }
-pre.code { margin: 8px 0 0; padding: 12px 14px; background: var(--bg3); border-radius: var(--r-m); overflow-x: auto; font: 13px/19px Consolas, "Cascadia Mono", Menlo, monospace; color: var(--fg1); white-space: pre-wrap; word-break: break-word; }
-.cite { color: var(--fg3); font-size: 13px; line-height: 18px; }
-.cite code, .grid p code, .plain code, .intro code, .walk code, .panel code { font: 13px Consolas, "Cascadia Mono", Menlo, monospace; }
-.walk { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: w; }
-.walk > li { counter-increment: w; background: var(--bg1); border-radius: var(--r-xl); box-shadow: var(--shadow4); padding: 20px 24px; }
-.walk > li h3::before { content: counter(w) ". "; color: var(--brand-fg); }
-.walk > li p { color: var(--fg2); }
-.walk > li .tag { display: inline-block; margin-bottom: 8px; padding: 2px 10px; border-radius: 999px; background: var(--brand-bg2); color: var(--brand-fg); font: 600 12px/18px var(--font); }
-.js .walk > li[hidden] { display: none; }
-.js .walk > li h3::before { content: none; }
-.controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-.controls .count { margin-left: 4px; color: var(--fg3); font-size: 14px; }
-button.btn { border: 0; cursor: pointer; }
-button.btn[disabled] { opacity: .45; cursor: default; }
-.dots { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 12px; padding: 0; list-style: none; }
-.dots button { all: unset; cursor: pointer; padding: 4px 10px; border-radius: 999px; background: var(--bg1); box-shadow: 0 0 2px var(--sh-a), 0 1px 2px var(--sh-k); font: 600 13px/18px var(--font); color: var(--fg2); }
-.dots button[aria-current="step"] { background: var(--brand); color: #fff; }
-.dots button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.explorer { display: none; }
-.js .explorer { display: block; }
-.grades { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
-.grades button { min-width: 88px; }
-.grades button[aria-pressed="true"] { outline: 2px solid var(--brand-fg); outline-offset: 2px; }
-.readout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 12px 0 0; padding: 0; list-style: none; }
-.readout li { background: var(--bg2); border-radius: var(--r-xl); padding: 12px 14px; font-size: 14px; line-height: 20px; color: var(--fg2); }
-.readout strong { display: block; font: 600 24px/32px var(--display); color: var(--brand-fg); }
-.scroll { overflow-x: auto; }
-.scores.walktable td { white-space: nowrap; }
-.scores.walktable td:nth-child(2) { font-weight: 400; color: var(--fg2); }
-.scores tr.on { background: var(--brand-bg2); }
-.pipe { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; }
-.pipe li { position: relative; }
-.pipe li:not(:last-child)::after { content: ""; position: absolute; right: -15px; top: 50%; width: 8px; height: 8px; border-top: 2px solid var(--fg3); border-right: 2px solid var(--fg3); transform: translateY(-50%) rotate(45deg); }
-.pipe button { all: unset; cursor: pointer; display: block; padding: 8px 14px; border-radius: var(--r-m); background: var(--bg1); box-shadow: var(--shadow4); font: 600 14px/20px var(--font); color: var(--fg1); }
-.pipe button.gate { border-top: 3px solid var(--brand); }
-.pipe button[aria-expanded="true"] { background: var(--brand); color: #fff; }
-.pipe button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.nojs-pipe { display: block; }
-.js .nojs-pipe { display: none; }
-.pipe { display: none; }
-.js .pipe { display: flex; }
-.panels { display: grid; gap: 12px; }
-.js .panels .panel[hidden] { display: none; }
-.panel h3 .kind { margin-left: 8px; color: var(--fg3); font-weight: 400; font-size: 14px; }
-.panel .eg { margin-top: 12px; padding: 12px 14px; border-left: 3px solid var(--brand); background: var(--bg2); border-radius: 0 var(--r-m) var(--r-m) 0; }
-.panel .eg p { margin: 0; }
-.panel .eg b { color: var(--fg1); }
-.catches li { margin-bottom: 12px; }
-@media (max-width: 960px) { .readout { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 640px) { .flow li:not(:last-child)::after { display: none; } .pipe li::after { display: none; } }
-</style>
+<link rel="stylesheet" href="site.css?v=8">
+<link rel="stylesheet" href="skopos-deep-dive.css?v=1">
 </head>
 <body>
 
@@ -79,30 +20,30 @@ button.btn[disabled] { opacity: .45; cursor: default; }
   <div class="wrap top-row">
     <a class="name" href="index.html">Bodi Raj</a>
     <nav aria-label="Site">
-      <a href="index.html">Case study</a>
+      <a href="index.html" aria-current="true">Skopos</a>
       <a href="vehicles.html">Vehicle work</a>
       <a href="mailto:bodiraj93@gmail.com">Email</a>
       <a href="https://www.linkedin.com/in/bodi-raj/">LinkedIn</a>
     </nav>
   </div>
 </header>
-<nav class="secnav" aria-label="Pages and sections">
-  <div class="wrap secnav-row"><a class="tab" href="index.html">Case study</a><a class="tab" href="skopos-deep-dive.html" aria-current="page">Technical deep dive</a><span class="sep" aria-hidden="true"></span><a href="#harness">The harness</a><a href="#generator">The generator</a><a href="#scheduler">Planner and FSRS</a><a href="#data">Data and encryption</a><a href="#testing">Test suite</a></div>
+<nav class="secnav" aria-label="Skopos pages and sections">
+  <div class="wrap secnav-row"><a class="tab" href="index.html">Case study</a><a class="tab" href="skopos-deep-dive.html" aria-current="page">Technical deep dive</a><span class="sep" aria-hidden="true"></span><a href="#harness">The harness</a><a href="#generator">The generator</a><a href="#scheduler">Planner and FSRS</a><a href="#data">Data and encryption</a><a href="#testing">Test suite</a><a href="#next">Next steps</a></div>
 </nav>
 
 <main>
 
 <section class="hero wrap">
   <p class="eyebrow">Skopos technical deep dive</p>
-  <h1>How Skopos is built and tested</h1>
-  <p class="lede">Skopos is a free MCAT study app in development for Windows and Mac. AI coding agents wrote its code and its tests. I wrote the task contracts and the project rules, including the rule that every task needs a test that fails on bad work. This page covers five parts of the project: the harness that checks the agents, the question generator, the planner and FSRS scheduling, data protection, and the test suite. The figures come from my project handbook, which was checked against the code, and from the code and the project plan directly.</p>
+  <h1>How I designed Skopos and how I check it</h1>
+  <p class="lede">Skopos is a free MCAT study app in development for Windows and Mac. AI coding agents wrote its code and its tests under the task contracts and project rules that I wrote. The central rule is that a task counts as done only when a test that fails on bad work passes on the new code. This page explains five parts of the design. For each part I describe the problem, the decision I made, the reason for it and the evidence that it works. The numbers come from the project plan, the commit history and the code.</p>
   <p class="note"><a href="index.html">Back to the case study</a></p>
 </section>
 
 <!-- 1. HARNESS -->
 <section class="wrap block" id="harness">
   <h2>1. The zero-trust harness</h2>
-  <p class="intro">I treat AI coding agents as capable but untrusted. They write working code quickly, and they can also report a test as passing when it did not run, or fix a different bug from the one requested. In this harness, an agent reporting that a task is done is not accepted until a separate check confirms it.</p>
+  <p class="intro">AI coding agents write working code quickly. They can also report a test as passing when it did not run, or fix a different bug from the one they were given. I decided to treat them as capable but untrusted. When an agent reports that a task is done, I accept it only after a check that the agent cannot change confirms it. Every task moves through the steps below, and five of them can reject the work.</p>
 
   <ol class="flow" aria-label="The steps of one task">
     <li><b>Contract</b>Purpose, instructions, acceptance test, write scope</li>
@@ -116,20 +57,20 @@ button.btn[disabled] { opacity: .45; cursor: default; }
   </ol>
   <p class="legend"><i aria-hidden="true"></i>Steps with a blue top edge can reject the work.</p>
 
-  <h3>Example task: VAULT-LEGACY, 2026-11-09</h3>
-  <p class="sub">Each step below is taken from the task record in the project plan and the commit history of its branch. Use Next and Back, or select a step.</p>
+  <h3>One real task, step by step: VAULT-LEGACY, 2026-11-09</h3>
+  <p class="sub">I chose this task because the verifier rejected the work twice before it passed. Each step is taken from the task record in the project plan and the commit history of its branch. Use Next and Back, or select a step.</p>
   <div class="stepper" data-stepper>
     <ol class="walk">
-      <li id="walk-1"><span class="tag">Finding</span><h3>Plain copies of study data were left on disk</h3><p>While the architecture chapter of the handbook was written and checked, a gap was found. After the move into the encrypted vault, the cleanup step deleted only the <code>.pre-sqlcipher-</code> and <code>.backup.json</code> files. The old plain data file stayed on disk. A blind verifier confirmed the finding, and the task was opened from it.</p></li>
-      <li id="walk-2"><span class="tag">Contract</span><h3>The contract set the acceptance test and the write scope</h3><p>The acceptance test, as written in the plan:</p><pre class="code">a new unit or e2e test fails on trunk (plain Skopos_Data.json still present after a migrated boot) and passes after the fix ...</pre><p>The rest of the acceptance text requires the citation checks for the two project maps in <code>tests/unit</code> to stay green. The write scope, as recorded, was <code>src/main/main.js</code>, <code>src/main/storageAdapter.js</code>, <code>tests/unit/</code> and two project maps. The instruction also excluded one change: "Do not change sandbox settings (a decision for later, record it)."</p></li>
+      <li id="walk-1"><span class="tag">Origin</span><h3>The task came from a handbook check</h3><p>I keep a handbook that explains each part of the app, and a blind verifier checks every chapter against the code. During the check of the architecture chapter, the verifier showed that the cleanup after the move into the encrypted vault deleted only the <code>.pre-sqlcipher-</code> and <code>.backup.json</code> files. The old plain data file stayed on disk. The task was opened from that check the same day.</p></li>
+      <li id="walk-2"><span class="tag">Contract</span><h3>The contract set the acceptance test and the write scope</h3><p>The acceptance test, as written in the plan, reads as follows.</p><pre class="code">a new unit or e2e test fails on trunk (plain Skopos_Data.json still present after a migrated boot) and passes after the fix ...</pre><p>The rest of the acceptance text requires the citation checks for the two project maps in <code>tests/unit</code> to stay green. The write scope, as recorded, was <code>src/main/main.js</code>, <code>src/main/storageAdapter.js</code>, <code>tests/unit/</code> and two project maps. The instruction also kept one change out of the task with the words "Do not change sandbox settings (a decision for later, record it)."</p></li>
       <li id="walk-3"><span class="tag">Fix 1</span><h3>The builder added a failing-first test and a first fix</h3><p>On the branch <code>lane/vault-legacy</code>, commit <code>7df4c0abe</code> added <code>tests/unit/vaultLegacyPlainJson.test.js</code> and a first fix. The fix deleted the plain data file after the encrypted vault opened and verified, and left safe mode unchanged.</p></li>
       <li id="walk-4"><span class="tag">Review 1</span><h3>The verifier returned FAILS and found more plain copies</h3><p>The verifier reported that "up to 5 plain .bak copies held student text after a verified open", and that "one safe-mode boot pins json for good". The recorded reason was that "plain student data on disk defeats the encryption".</p></li>
       <li id="walk-5"><span class="tag">Scope change</span><h3>The task scope was widened by a recorded decision</h3><p>Commit <code>00610833f</code> recorded the decision in the plan. After the vault is verified readable, the plain <code>.bak</code> copies are removed as well. A profile left on JSON by a safe-mode boot returns to the vault on the next healthy boot.</p></li>
       <li id="walk-6"><span class="tag">Fix 2</span><h3>The second fix moved the cleanup into one function</h3><p>Commit <code>61214dfae</code> added <code>removePlainCopies</code>, which runs only after a verified encrypted open. In safe mode the plain file holds the live data, so the function does not touch it. A profile in safe mode now tries the vault again on the next boot.</p></li>
       <li id="walk-7"><span class="tag">Review 2</span><h3>The verifier returned FAILS a second time</h3><p>The verifier found two problems. Line numbers cited in the project map were out of date after the code moved. On the old code, the tests failed because a function they called did not exist yet. They needed to fail because plain files were left on disk.</p></li>
-      <li id="walk-8"><span class="tag">Fix 3</span><h3>The tests were corrected to fail on the actual defect</h3><p>Commit <code>3ce478ddf</code> changed the tests to call only helpers that exist on the old code. On the trunk, the core cases now fail on plain student text left on disk. The project map cites the correct lines.</p></li>
-      <li id="walk-9"><span class="tag">Review 3</span><h3>The verifier returned HOLDS</h3><p>The verdict stored in the plan begins:</p><pre class="code">HOLDS tests/unit/vaultLegacyPlainJson.test.js 4/4 on branch, 3/4 fail on flow-build on plain student text left on disk</pre><p>The verdict also records a probe the verifier ran. With a wrong key or a corrupt vault, the plain files were kept. With the correct key, only the encrypted vault remained. The sandbox setting was unchanged, as the contract required.</p></li>
-      <li id="walk-10"><span class="tag">Receipt</span><h3>The receipt recorded the test run</h3><p>An excerpt from <code>.claude/receipts/VAULT-LEGACY.json</code>:</p><pre class="code">"label": "VAULT-LEGACY",
+      <li id="walk-8"><span class="tag">Fix 3</span><h3>The tests were corrected to fail for the right reason</h3><p>Commit <code>3ce478ddf</code> changed the tests to call only helpers that exist on the old code. On the trunk, the core cases now fail on plain student text left on disk. The project map cites the correct lines.</p></li>
+      <li id="walk-9"><span class="tag">Review 3</span><h3>The verifier returned HOLDS</h3><p>The verdict stored in the plan begins with this line.</p><pre class="code">HOLDS tests/unit/vaultLegacyPlainJson.test.js 4/4 on branch, 3/4 fail on flow-build on plain student text left on disk</pre><p>The verdict also records a probe the verifier ran. With a wrong key or a corrupt vault, the plain files were kept. With the correct key, only the encrypted vault remained. The sandbox setting was unchanged, as the contract required.</p></li>
+      <li id="walk-10"><span class="tag">Receipt</span><h3>The receipt recorded the test run</h3><p>This is an excerpt from <code>.claude/receipts/VAULT-LEGACY.json</code>.</p><pre class="code">"label": "VAULT-LEGACY",
 "exitCode": 0,
 "durationMs": 9228,
 "git": { "branch": "lane/vault-legacy", ... },
@@ -139,45 +80,44 @@ button.btn[disabled] { opacity: .45; cursor: default; }
   </div>
 
   <div class="grid two after">
-    <article class="card pad"><h3>Task contracts</h3><p>A script generates each contract from the project plan. There are about 175 contract files. Each contract states why the task exists, what to do, the acceptance test, the files the agent may change, and the decisions that are outside its scope. If a fix needs a file outside the write scope, the agent stops and reports it.</p></article>
-    <article class="card pad"><h3>Failing-first tests</h3><p>The acceptance test must fail on the old code before the change and pass after it. This shows the test detects the defect. Builders may not edit a failing behaviour test to make it pass. The one exception is a declared golden file rebuild, where the builder must list which values changed and why.</p></article>
+    <article class="card pad"><h3>Task contracts</h3><p>A script generates each contract from the project plan, and there are about 175 contract files. Each contract states why the task exists, what to do, the acceptance test, the files the agent may change, and the decisions that are outside its scope. I limit the write scope because an agent that may change any file can make a test pass by changing the wrong one. If a fix needs a file outside the scope, the agent stops and reports it.</p></article>
+    <article class="card pad"><h3>Failing-first tests</h3><p>The acceptance test must fail on the old code before the change and pass after it. I require this because a test that already passes on the old code says nothing about the fix. Builders may not edit a failing behaviour test to make it pass. The one exception is a declared golden file rebuild, where the builder must list which values changed and why.</p></article>
     <article class="card pad"><h3>Branches and worktrees</h3><p>Each task runs on a branch named <code>lane/</code> plus a task name, usually in its own Git worktree, so unfinished work in one task does not affect the tests of another. There are about 150 worktrees and about 200 lane branches on GitHub.</p></article>
-    <article class="card pad"><h3>The blind verifier</h3><p>The verifier is a second AI agent. It reads only the diff, the receipt and the acceptance test, and never the reasoning of the builder. It reruns the commands, restores the old code to check that the test fails, checks that no test was weakened, and does not edit anything. A FAILS verdict must cite evidence, either a command that exits non-zero or a file and line. The reply is one line that starts with HOLDS or FAILS.</p></article>
-    <article class="card pad"><h3>Receipts</h3><p>A receipt records the command, its exit code, the pass and fail counts, the Git commit and a SHA-256 hash of every file in scope. The check command rehashes the files and reruns the command. On 2026-10-05 an audit replaced the receipt script with a two-line script that always reported success, and a task was marked done. Since then, the hash of the receipt script is signed and stored inside the <code>.git</code> folder, and the plan script checks it before it accepts any verdict.</p></article>
+    <article class="card pad"><h3>The blind verifier</h3><p>The verifier is a second AI agent. It reads only the diff, the receipt and the acceptance test, and never the reasoning of the builder, so it judges the result without taking on the builder's assumptions. It reruns the commands, restores the old code to check that the test fails, checks that no test was weakened, and does not edit anything. A FAILS verdict must cite evidence, either a command that exits non-zero or a file and line. The reply is one line that starts with HOLDS or FAILS.</p></article>
+    <article class="card pad"><h3>Receipts</h3><p>A receipt records the command, its exit code, the pass and fail counts, the Git commit and a SHA-256 hash of every file in scope. The check command rehashes the files and reruns the command. On 2026-10-05 an audit replaced the receipt script with a two-line script that always reported success, and a task was marked done. I closed that path. The hash of the receipt script is now signed and stored inside the <code>.git</code> folder, and the plan script checks it before it accepts any verdict.</p></article>
     <article class="card pad"><h3>The done gate and the merge gate</h3><p><code>state.js done</code> rejects a task that has no receipt, no named verifier, or no one-line verdict starting with HOLDS. It then checks that the receipt is signed and still passes. The merge script reruns the unit tests the branch changed on the merged code, rebuilds the app when its source changed, and checks the receipt again. If the branch changed a test that was not run, the result is INCOMPLETE.</p></article>
   </div>
 
   <article class="card pad feature after">
     <h3>The command guard</h3>
-    <p>A script checks each shell command before an agent runs it. These are its responses, shortened:</p>
+    <p>A script checks each shell command before an agent runs it. These are its responses, shortened.</p>
     <pre class="code">"git add -A"           =&gt; refused: stage explicit paths
 "git push --force"     =&gt; refused: never force-push
 "npx playwright test"  =&gt; refused: use the repo script, which takes the app lock and rebuilds
 "git add scripts/a.js" =&gt; allowed</pre>
-    <p>I also tested its limits. Staging a whole folder by name is allowed. A banned command inside quotes is allowed, because the guard treats quoted text as data so that commit messages do not trigger it. Running Playwright by its file path is allowed. The guard prevents accidental mistakes. It does not stop an agent that deliberately works around it, so the receipts and the verifier remain the main checks.</p>
+    <p>I built the guard to stop accidents. I also tested how far it goes. Staging a whole folder by name is allowed. A banned command inside quotes is allowed, because the guard treats quoted text as data so that commit messages do not trigger it. Running Playwright by its file path is allowed. An agent that deliberately works around the guard can get past it, so the receipts and the blind verifier are the checks that decide.</p>
   </article>
 
-  <h3 class="gap">Defects the harness caught</h3>
+  <h3 class="space">Cases the blind review caught</h3>
+  <p class="intro">A receipt proves that a command ran and passed. It cannot show that a test checks the right behaviour, or that a sentence in the documentation is true. These cases from the project record are the reason the verifier stays in every task.</p>
   <ul class="plain catches">
-    <li><strong>A test file count was off by one.</strong> A handbook draft stated 1,391 files in <code>tests/unit</code> and 421 committed receipts. The verifier counted 1,392 and 422, because the commit for the draft had added a test file and a receipt after the count. Counts are now given as approximate, with the date.</li>
-    <li><strong>A statement about the test clock was reversed.</strong> A draft stated that the test clock "runs a fixed amount behind" to reach Monday. The verifier cited <code>tests/e2e/helpers/pinnedClock.js:4</code>, which states that the clock moves ahead and never behind. The verifier found the error by reading the source of the clock helper. In this case and the count case above, the receipts were green because the tests passed. Only the blind review found the errors in the text.</li>
-    <li><strong>A cascade delete was declared but not enforced.</strong> The database schema declares that deleting a deck deletes its notes, but the SQLite setting that enforces foreign keys is never switched on. This was found while the data chapter of the handbook was verified. Task SAVE-GAP kept the deletes in code, labelled the schema clauses "dead by design", and added a test that deleting a deck leaves no orphan rows.</li>
-    <li><strong>The privacy audit missed one network path.</strong> The first search looked only for <code>fetch(</code>. The verifier found calls made through a renamed function, <code>fetchImpl(</code>, which request the model list from each AI provider. The search was widened and every result was reviewed.</li>
-    <li><strong>One test assertion was changed through a recorded decision.</strong> After the SAVE-GAP fix, an older test still checked that the old data file was deleted, while the fix now keeps it aside. The change to that assertion was recorded in the plan as a decision with its reason, and the verifier confirmed that only that line changed.</li>
-    <li><strong>A spec assertion was changed only after my approval.</strong> An end-to-end test limited exam charts to half the pane width, while the design board and my ruling of 2026-11-08 set charts to the full width of the passage column. The builder found that the test was out of date and did not change the assertion without approval. I approved the change on 2026-11-09, and the approval is recorded in the plan under task EXHIBIT-WIDTH.</li>
-    <li><strong>The new locked-vault screen could have shown the wrong message.</strong> For task KEY-LOST, the verifier found that an older menu line stating the data was not encrypted still appeared while the vault was locked. It also found that a corrupt vault would have been reported as a missing key. The recovery screen now appears only when the key is missing or unreadable, and the older line is hidden while the vault is locked.</li>
+    <li><strong>The recovery screen for a locked vault.</strong> For task KEY-LOST, the verifier showed that an older menu line stating the data was not encrypted still appeared while the vault was locked, and that a corrupt vault would have been reported as a missing key. Before the merge, the recovery screen was limited to a missing or unreadable key, and the older line was hidden while the vault is locked.</li>
+    <li><strong>A statement about the test clock.</strong> A handbook draft stated that the test clock "runs a fixed amount behind" to reach Monday. The verifier cited <code>tests/e2e/helpers/pinnedClock.js:4</code>, which states that the clock moves ahead and never behind. The receipts were green because the tests passed. Only the blind review found the error in the text.</li>
+    <li><strong>The search for network calls.</strong> The first search looked only for <code>fetch(</code>. The verifier found calls made through a renamed function, <code>fetchImpl(</code>, which request the model list from each AI provider. The search was widened and every result was reviewed.</li>
+    <li><strong>A test assertion that disagreed with the design.</strong> An end-to-end test limited exam charts to half the pane width, while the design board and my ruling of 2026-11-08 set charts to the full width of the passage column. The builder stopped and did not change the assertion without approval. I approved the change on 2026-11-09, and the approval is recorded in the plan under task EXHIBIT-WIDTH.</li>
+    <li><strong>A changed assertion kept to one line.</strong> After the crash-safe save change, an older test still checked that the old data file was deleted, while the new code keeps it aside. The change to that assertion was recorded in the plan as a decision with its reason, and the verifier confirmed that only that line changed.</li>
   </ul>
 
   <article class="card pad diff after">
-    <h3>Limits of the harness</h3>
-    <p>Model output is not deterministic, and the same prompt can produce different code. The scripted gates, which are the tests, the receipts, the command guard and <code>state.js done</code>, give the same result every time for the same input. The blind verifier is a second AI model. It is blind and adversarial, and any defect it reports must be shown by a failing test before the code changes. The command guard and some other guards run as Claude Code hooks. The rules, checks, receipts and plan are scripts in the project itself. The builder and the verifier are both AI models and can miss the same problem. The merge gate reruns the changed tests, not the full suite. There is no continuous integration on every push yet, so a receipt shows that a test passed on this one machine. About 54 completed tasks are marked "legacy" because they were finished before the verifier rule existed. My own runs of the app are not yet recorded in the plan.</p>
+    <h3>How I weigh the checks</h3>
+    <p>Model output is not deterministic, and the same prompt can produce different code. For that reason the checks that decide are scripts. The tests, the receipts, the command guard and <code>state.js done</code> give the same result every time for the same input. The verifier is also an AI model, so a defect it reports counts only when a failing test shows it before the code changes. The builder and the verifier can miss the same problem, and that is why I run the app myself at key gates. About 54 tasks were finished before I added the verifier rule. The plan marks them as legacy, so they stay separate from the tasks a blind verifier passed.</p>
   </article>
 </section>
 
 <!-- 2. GENERATOR -->
 <section class="wrap block" id="generator">
   <h2>2. The question generator</h2>
-  <p class="intro">Language models write the questions, and other models and code check them. The pipeline is called BWV, for Blueprint, Writer, Verifier. A question that fails any stage is dropped with a named reason, and the other questions in the batch continue. Select a stage to see what it checks and an example from the project records.</p>
+  <p class="intro">A language model can write a question that reads well and still has a wrong key or a second defensible answer. I decided that models write the questions and separate checks decide whether each one is kept. Some checks are code and some are other models. The pipeline is called BWV, for Blueprint, Writer, Verifier. A question that fails any stage is dropped with a named reason, and the other questions in the batch continue. Select a stage to see what it checks and an example from the project records.</p>
 
   <ol class="pipe" aria-label="Pipeline stages">
     <li><button type="button" aria-controls="st-plan">Plan</button></li>
@@ -193,11 +133,11 @@ button.btn[disabled] { opacity: .45; cursor: default; }
 
   <div class="panels">
     <article class="card pad panel" id="st-plan"><h3>Plan<span class="kind">model</span></h3><p>One call plans a batch of blueprints. Each blueprint sets what the question asserts, the operation, the key claim, the steps, and three common misconceptions to use as wrong choices. Each blueprint is also assigned the letter for its key, rotating through A to D.</p><div class="eg"><p>The BB-R25 run log records one batch as "planned 6 · written 10 · lint-failed 1 · solver-verified 4 · grounded 4 · landed 4", so ten drafts produced four landed questions.</p></div></article>
-    <article class="card pad panel" id="st-write"><h3>Write<span class="kind">model</span></h3><p>One call per blueprint writes the question from a gold example and cites the span of the source that supports the answer. The writer does not write CARS passages. CARS passages are real excerpts, word for word, credited to their authors, and the writer receives the passage as fixed text and writes only the questions. Science passages are written from a real source. They may describe an invented experiment, but they may not state a fact the source does not support.</p><div class="eg"><p>CARS passages were changed to real excerpts after a blind rating on 2026-11-01, in which the rater identified all 12 model-written passages as purpose-written. Every landed CARS passage so far comes from open-access humanities essays in the Open Library of Humanities and PubMed Central.</p></div></article>
-    <article class="card pad panel" id="st-lint"><h3>Lint and maths<span class="kind">code</span></h3><p>Code checks each draft for duplicate wrong choices, text the app cannot display, and numeric answers that do not match their formula. For a numeric key, the writer must supply the formula. A small parser evaluates it without <code>eval</code>, using a fixed list of functions and constants. The check rejects any number the question does not give, requires the key to match the computed value at its own significant figures and sign, and requires that no wrong choice also matches.</p><div class="eg"><p>This check was added because a paid judge model detected a wrong key on some runs and missed it on others. One key read "approximately 6.66 m/s" where the square root of 44.28 is 6.654. Another gave +8.82 J where the work is negative. On a test item, "6.65 m/s" failed as <code>key_computation_mismatch</code>, and a formula that used 3.1, a number the stem does not give, failed as <code>key_computation_foreign_number</code>.</p></div></article>
+    <article class="card pad panel" id="st-write"><h3>Write<span class="kind">model</span></h3><p>One call per blueprint writes the question from a gold example and cites the span of the source that supports the answer. The writer does not write CARS passages. CARS passages are real excerpts, word for word, credited to their authors, and the writer receives the passage as fixed text and writes only the questions. Science passages are written from a real source. They may describe an invented experiment, but they may not state a fact the source does not support.</p><div class="eg"><p>CARS passages became real excerpts after a blind rating on 2026-11-01, in which the rater identified all 12 model-written passages as purpose-written. A real excerpt removes that signal. Every landed CARS passage so far comes from open-access humanities essays in the Open Library of Humanities and PubMed Central.</p></div></article>
+    <article class="card pad panel" id="st-lint"><h3>Lint and maths<span class="kind">code</span></h3><p>Code checks each draft for duplicate wrong choices, text the app cannot display, and numeric answers that do not match their formula. For a numeric key, the writer must supply the formula. A small parser evaluates it without <code>eval</code>, using a fixed list of functions and constants. The check rejects any number the question does not give, requires the key to match the computed value at its own significant figures and sign, and requires that no wrong choice also matches.</p><div class="eg"><p>This check is code because a paid judge model detected a wrong key on some runs and missed it on others. Code gives the same answer every time. One key read "approximately 6.66 m/s" where the square root of 44.28 is 6.654. Another gave +8.82 J where the work is negative. On a test item, "6.65 m/s" failed as <code>key_computation_mismatch</code>, and a formula that used 3.1, a number the stem does not give, failed as <code>key_computation_foreign_number</code>.</p></div></article>
     <article class="card pad panel" id="st-solve"><h3>Solve<span class="kind">second model</span></h3><p>A different model answers the question with the source available. It checks for a second defensible answer, two choices that mean the same thing, or a stem that reveals the answer. In strict mode, a solver confidence below 0.75 drops the question.</p><div class="eg"><p>In the BB-R25 batch, 10 drafts were written, 1 failed the lint stage and 4 were verified by the solver. The other drafts did not continue.</p></div></article>
     <article class="card pad panel" id="st-lure"><h3>Lure<span class="kind">small model, measurement only</span></h3><p>A small model answers without the source, to estimate how a less prepared student would answer. The wrong choice it selects is recorded on the question. This stage does not reject questions, except in one catalogue path. Where its answer is used as a gate, it answers twice with the choices rotated, so that its preferred letter does not affect the result.</p></article>
-    <article class="card pad panel" id="st-gates"><h3>Gates<span class="kind">code, then judge model</span></h3><p>Code runs a second set of checks, then a judge model scores the question against the item standard. A question that fails is dropped with its reason.</p><div class="eg"><p>The header comment of the gates file stated that the file was "called by nothing yet". The comment was out of date. The pipeline calls the file in two places.</p></div></article>
+    <article class="card pad panel" id="st-gates"><h3>Gates<span class="kind">code, then judge model</span></h3><p>Code runs a second set of checks, then a judge model scores the question against the item standard. A question that fails is dropped with its reason.</p></article>
     <article class="card pad panel" id="st-ground"><h3>Grounding<span class="kind">code, then verifier model</span></h3><p>Code searches the source for the cited quote. An exact match passes. Otherwise, at least 80 percent of the words of the quote must appear within one window of the source of the same length. A verifier model then rates whether the line supports the answer. Only a full yes passes. If the source also supports a wrong choice, the question fails as <code>distractor_supported</code>. CARS questions may not rely on any fact outside the passage.</p><div class="eg"><p>For CARS, the content words of the key must match one passage sentence at a share of 0.9 or higher. The code records that a threshold of 0.8 failed one real AAMC question and 0.9 failed none, measured on 53 AAMC CARS items.</p></div></article>
     <article class="card pad panel" id="st-land"><h3>Land<span class="kind">code</span></h3><p>The question is saved only at this stage, and its choices are then rotated by a random amount. The key and each "why wrong" note move with their own text. Numeric choices stay in ascending order, as on the exam. A question whose explanation still names the old letter, such as "The answer is C" after the key moved to A, is dropped as <code>letter_mismatch</code>.</p><div class="eg"><p>In a count of 2,109 landed questions, the key was A for 503 (23.9%), B for 573 (27.2%), C for 555 (26.3%) and D for 478 (22.7%).</p></div></article>
   </div>
@@ -234,12 +174,12 @@ button.btn[disabled] { opacity: .45; cursor: default; }
 <!-- 3. SCHEDULER -->
 <section class="wrap block" id="scheduler">
   <h2>3. The planner and FSRS</h2>
-  <p class="intro">The study plan is calculated each time and is not stored. <code>deriveRoad()</code> is a pure function of the exam date, the daily study minutes, the study days and the work already completed. A missed day or a new exam date recalculates the whole plan. Only the choices the student makes, such as a booked day off, are saved. Reviews are scheduled by FSRS through the open-source ts-fsrs library, version 5.3.2, which implements FSRS-6 with 21 weights. One module owns the scheduler. It is pure, meaning it takes a card and a grade and returns the updated card without saving anything.</p>
+  <p class="intro">A study plan has to stay correct after a missed day or a new exam date. I decided the plan is calculated each time and never stored. <code>deriveRoad()</code> is a pure function of the exam date, the daily study minutes, the study days and the work already completed. A missed day or a new exam date recalculates the whole plan, so the plan always matches the work the student has done. Only the choices the student makes, such as a booked day off, are saved. Reviews are scheduled by FSRS, the open scheduler that Anki also offers, through the open-source ts-fsrs library, version 5.3.2, which implements FSRS-6 with 21 weights. One module owns the scheduler. It is pure, meaning it takes a card and a grade and returns the updated card without saving anything, so every interval can be tested with fixed inputs.</p>
 
   <div class="grid three">
     <article class="card pad"><h3>Stability</h3><p>The number of days until the probability of recall falls to 90 percent. A higher value means a stronger memory.</p></article>
     <article class="card pad"><h3>Difficulty</h3><p>How hard the card is for this student, on a scale of 1 to 10.</p></article>
-    <article class="card pad"><h3>Retention target of 0.9</h3><p>The scheduler sets each interval so that the probability of recall on the due date is 90 percent. Skopos uses the ts-fsrs default, confirmed from the running engine. Interval fuzz is off, so the same review always produces the same date.</p></article>
+    <article class="card pad"><h3>Retention target of 0.9</h3><p>The scheduler sets each interval so that the probability of recall on the due date is 90 percent. Skopos uses the ts-fsrs default, confirmed from the running engine. Interval fuzz is off, so the same review always produces the same date and a test can check it exactly.</p></article>
   </div>
 
   <article class="card pad after" id="fsrs-explorer">
@@ -265,7 +205,7 @@ button.btn[disabled] { opacity: .45; cursor: default; }
         <button type="button" class="btn subtle" data-act="reset">Start over</button>
       </div>
     </div>
-    <div class="scroll gap">
+    <div class="scroll space">
       <table class="scores walktable">
         <caption class="sub" style="text-align:left;caption-side:top;padding-bottom:4px">Every grade at every review on the Good path (d is days, S is stability, D is difficulty)</caption>
         <thead><tr><th scope="col">Review</th><th scope="col">Stability before</th><th scope="col">Recall on the due date</th><th scope="col">Again</th><th scope="col">Hard</th><th scope="col">Good</th><th scope="col">Easy</th></tr></thead>
@@ -283,48 +223,46 @@ button.btn[disabled] { opacity: .45; cursor: default; }
   <script type="application/json" id="fsrs-data">[{"review":1,"before":{"stability":0,"difficulty":0,"reps":0,"retrievability":null},"out":{"again":{"stability":0.21,"difficulty":6.41,"days":1,"lapses":0},"hard":{"stability":1.29,"difficulty":5.11,"days":2,"lapses":0},"good":{"stability":2.31,"difficulty":2.12,"days":3,"lapses":0},"easy":{"stability":8.3,"difficulty":1,"days":8,"lapses":0}}},{"review":2,"before":{"stability":2.31,"difficulty":2.12,"reps":1,"retrievability":0.881},"out":{"again":{"stability":0.64,"difficulty":7.39,"days":1,"lapses":1},"hard":{"stability":9.23,"difficulty":4.75,"days":9,"lapses":0},"good":{"stability":13.83,"difficulty":2.11,"days":14,"lapses":0},"easy":{"stability":23.88,"difficulty":1,"days":24,"lapses":0}}},{"review":3,"before":{"stability":13.83,"difficulty":2.11,"reps":2,"retrievability":0.899},"out":{"again":{"stability":1.73,"difficulty":7.39,"days":2,"lapses":1},"hard":{"stability":39.77,"difficulty":4.75,"days":40,"lapses":0},"good":{"stability":56.96,"difficulty":2.1,"days":57,"lapses":0},"easy":{"stability":94.6,"difficulty":1,"days":95,"lapses":0}}},{"review":4,"before":{"stability":56.96,"difficulty":2.1,"reps":3,"retrievability":0.9},"out":{"again":{"stability":3.19,"difficulty":7.39,"days":3,"lapses":1},"hard":{"stability":140.72,"difficulty":4.74,"days":141,"lapses":0},"good":{"stability":196.24,"difficulty":2.1,"days":196,"lapses":0},"easy":{"stability":317.81,"difficulty":1,"days":318,"lapses":0}}},{"review":5,"before":{"stability":196.24,"difficulty":2.1,"reps":4,"retrievability":0.9},"out":{"again":{"stability":5.03,"difficulty":7.39,"days":5,"lapses":1},"hard":{"stability":430.93,"difficulty":4.74,"days":431,"lapses":0},"good":{"stability":586.48,"difficulty":2.09,"days":586,"lapses":0},"easy":{"stability":927.13,"difficulty":1,"days":927,"lapses":0}}}]</script>
 
   <div class="grid two after">
-    <article class="card pad"><h3>Separate schedulers for cards and questions</h3><p>A flashcard uses short-term learning steps, so a new card graded Good returns in ten minutes within the same session. A question does not use them, because the Today screen counts work by calendar day, and a question answered once was being counted as due again the same day. The question scheduler is the same scheduler with short-term steps switched off. All other parameters are shared.</p></article>
-    <article class="card pad"><h3>Validation of imported settings</h3><p>When ts-fsrs receives a weight vector of the wrong length, it uses its default weights without raising an error. Without validation, the app would report imported Anki settings as active while it used the defaults. The engine validates the values first and rejects anything out of range by name.</p></article>
+    <article class="card pad"><h3>Separate schedulers for cards and questions</h3><p>A flashcard uses short-term learning steps, so a new card graded Good returns in ten minutes within the same session. A question does not use them. The Today screen counts work by calendar day, and with learning steps a question answered once was counted as due again the same day. The question scheduler is the same scheduler with short-term steps switched off. All other parameters are shared.</p></article>
+    <article class="card pad"><h3>Validation of imported settings</h3><p>When ts-fsrs receives a weight vector of the wrong length, it uses its default weights without raising an error. Without validation, the app would report imported Anki settings as active while it used the defaults. The engine therefore validates the values first and rejects anything out of range by name.</p></article>
   </div>
 </section>
 
 <!-- 4. DATA -->
 <section class="wrap block" id="data">
   <h2>4. Data and encryption</h2>
-  <p class="intro">Skopos does not use an account or a server. Study data is stored in one SQLCipher database on the local computer. SQLCipher is a version of SQLite that encrypts the whole database file.</p>
+  <p class="intro">A student's study history is personal. I decided Skopos has no account and no server, and that study data stays on the student's own computer. It is stored in one SQLCipher database. SQLCipher is a version of SQLite that encrypts the whole database file.</p>
   <div class="grid three">
-    <article class="card pad"><h3>Key storage</h3><p>A random 32-byte key is generated on first run and stored through Electron safeStorage, which uses the protected storage of the operating system. If that storage is unavailable, the key manager refuses to run. There is no plain-text fallback. AI provider keys and the phone pairing secret are stored the same way.</p></article>
+    <article class="card pad"><h3>Key storage</h3><p>A random 32-byte key is generated on first run and stored through Electron safeStorage, which uses the protected storage of the operating system. If that storage is unavailable, the key manager refuses to run. There is no plain-text fallback, because a key saved in plain text beside the database would undo the encryption. AI provider keys and the phone pairing secret are stored the same way.</p></article>
     <article class="card pad"><h3>How encryption is tested</h3><p>A plain SQLite file always begins with the bytes <code>SQLite format 3</code>. An end-to-end test starts the real app and fails if the database file begins with them. When a vault created by the test simulation is opened with the plain SQLite library and no key, the library returns "file is not a database".</p></article>
-    <article class="card pad"><h3>When the vault cannot open</h3><p>A boot guard restores the last good copy, runs the app in safe mode and informs the student, so no work is lost. In safe mode the data is stored as plain JSON on disk. This is a known gap and is documented.</p></article>
+    <article class="card pad"><h3>When the vault cannot open</h3><p>A boot guard restores the last good copy, opens the app in safe mode and tells the student. In safe mode the app keeps working from a local JSON copy, so a student never loses a session. The next healthy start moves the data back into the encrypted vault.</p></article>
+  </div>
+
+  <div class="grid two after">
+    <article class="card pad"><h3>Plain copies removed once the vault is verified</h3><p>After the move into the vault, the old plain <code>Skopos_Data.json</code> and its plain <code>.bak</code> copies are deleted once the vault opens and verifies. They are never deleted in safe mode, because there they hold the live data. This is the task shown in the walk-through above.</p></article>
+    <article class="card pad"><h3>A save that always leaves a data file</h3><p>Windows can refuse a rename. In that case the save moves the old file aside and keeps it, so a crash at any point leaves a data file that the next start can load. The aside copy is removed after the next successful save. A unit test simulates a crash at that point and checks the next start.</p></article>
+    <article class="card pad"><h3>A locked vault is never deleted</h3><p>If the key file is lost and the vault remains, the app never deletes or replaces the vault. The student sees a recovery screen titled "Your study data is locked", in words I approved, with two buttons, "Restore a backup" and "Copy details".</p></article>
+    <article class="card pad"><h3>Deletes handled in code</h3><p>The database schema declares that deleting a deck deletes its notes, and SQLite enforces that only when foreign keys are switched on. The app does not switch them on, so the deletes are done in code, the schema clauses are labelled "dead by design", and a test checks that deleting a deck leaves no orphan rows.</p></article>
   </div>
 
   <article class="card pad feature after">
     <h3>Network connections</h3>
-    <p>The app code was searched for every network call, and each result was reviewed. The connections, in the order they occur:</p>
+    <p>Skopos is built to work offline, so every connection it makes has a stated reason. The app loads no script from the internet. Math is typeset by KaTeX from the app's own files, and a unit test fails if <code>index.html</code> gains a script from a web address. The app code was searched for every network call, and each result was reviewed. These are the connections, in the order they occur.</p>
     <ol class="plain">
-      <li>On every launch, two scripts load from public CDNs, JSZip and MathJax. The app does not use them. This is an open finding.</li>
       <li>Sixty seconds after start, in packaged builds only, the update check asks GitHub Releases for a newer version.</li>
-      <li>When a student saves an AI key, the app asks that provider (Google, OpenAI, Anthropic or Groq) for the list of models the key can use. This sends the key before any question is generated. With no key saved, no call is made.</li>
+      <li>When a student saves an AI key, the app asks that provider (Google, OpenAI, Anthropic or Groq) for the list of models the key can use, so that it uses the newest model the key offers. This sends the key before any question is generated. With no key saved, no call is made.</li>
       <li>When the student generates questions with that key, the prompt is sent to the chosen provider and can include study text.</li>
       <li>When a phone is paired, messages pass through a relay. They are encrypted with AES-256-GCM before they leave, using keys derived from a secret that is shared only through the QR code. The relay cannot decrypt them.</li>
       <li>Only web links are opened, and they open in the system browser.</li>
-      <li>Crash reports are not sent. Sending requires the student to opt in and a configured project address, and the address is empty.</li>
+      <li>Crash reports stay off unless the student opts in, because the data belongs to the student. The reporter is built to scrub every report and to leave out native crash dumps, because raw process memory can hold study text.</li>
     </ol>
-    <p class="note">The audit did not cover the code inside installed libraries, or traffic that Electron or the operating system sends on its own. A text search finds only what its pattern matches, so the next step is a test that fails when a new network call is added.</p>
   </article>
-
-  <div class="grid three after">
-    <article class="card pad"><h3>Fix: plain copies removed after migration</h3><p>After the move into the vault, the old plain <code>Skopos_Data.json</code> and up to five plain <code>.bak</code> copies remained beside the encrypted file. Since VAULT-LEGACY was merged, they are deleted once the vault opens and verifies, and never in safe mode. This is the task shown in the example above.</p></article>
-    <article class="card pad"><h3>Fix: crash-safe save</h3><p>When Windows refused a rename, one save path deleted the old file before it renamed the new one, so a crash at that point left no data file. Since SAVE-GAP was merged, the old file is moved aside and kept, the next boot can load it, and the aside copy is removed after the next successful save.</p></article>
-    <article class="card pad"><h3>Fix: locked-vault recovery screen</h3><p>When the key file was lost but the vault remained, the app showed an empty main area with no message. Now a vault that cannot be opened is never deleted or replaced. The student sees a recovery screen titled "Your study data is locked", worded as I approved it, with two buttons, "Restore a backup" and "Copy details".</p></article>
-  </div>
-  <p class="note">Open item: the main window runs with context isolation on and Node integration off, but with the sandbox off. The two PDF helper windows run sandboxed.</p>
 </section>
 
 <!-- 5. TESTING -->
 <section class="wrap block" id="testing">
   <h2>5. The test suite</h2>
-  <p class="intro">Skopos has nearly 2,000 automated test files, and each file contains several test cases.</p>
+  <p class="intro">Many faults in a study app appear only after weeks of use, such as a rounding error in the scheduler or a save that loses a day of reviews. I decided the suite would include long simulations and exact golden masters as well as ordinary unit tests. Skopos has nearly 2,000 automated test files, and each file contains several test cases.</p>
   <ul class="facts" aria-label="Test files">
     <li><strong>Nearly 2,000</strong><span>automated test files in total</span></li>
     <li><strong>About 1,400</strong><span>of them are Node unit and integration test files</span></li>
@@ -333,13 +271,26 @@ button.btn[disabled] { opacity: .45; cursor: default; }
   </ul>
   <div class="grid three after">
     <article class="card pad"><h3>Golden masters</h3><p>The 14 golden masters store the full output of the planning and scheduling calculations for fixed inputs. One test changes a copy by 0.000000001 and confirms that the comparison detects it. Values are compared to 10 decimal places. A master is rebuilt only when the calculation is changed on purpose, never to clear a failure.</p></article>
-    <article class="card pad"><h3>Six-month simulation</h3><p>A simulated student studies for 180 days through the real save path and a real encrypted database. The schedule includes Sundays off, a holiday, a three-week gap, a 400-review catch-up day and 16 scripted fault events. The run with seed 1 finished in 2 minutes 12 seconds with zero failures and six practice exams.</p></article>
+    <article class="card pad"><h3>Six-month simulation</h3><p>A simulated student studies for 180 days through the real save path and a real encrypted database. The schedule includes Sundays off, a holiday, a three-week break, a 400-review catch-up day and 16 scripted fault events. The run with seed 1 finished in 2 minutes 12 seconds with zero failures and six practice exams.</p></article>
     <article class="card pad"><h3>Three-year simulation</h3><p>A second simulated student uses the app for 1,095 days, then exports the data and resets the app. In one run, 23 of 23 checks passed and a 4.8 MB export was read back byte for byte with zero records lost. This run saves weekly instead of daily, which keeps it to five minutes.</p></article>
-    <article class="card pad"><h3>Scale test with 100,000 cards</h3><p>A scale run loads 100,000 cards and 4,000 questions into a 49.7 MB vault. The due scan took 41 ms, and the deck page renders at most 49 rows at any deck size. One finding is open. The Progress activity chart took 600 ms against a 250 ms limit, because it reads all 332,643 raw study events.</p></article>
+    <article class="card pad"><h3>Scale test with 100,000 cards</h3><p>A scale run loads 100,000 cards and 4,000 questions into a 49.7 MB vault. The due scan took 41 ms, and the deck page renders at most 49 rows at any deck size. The run also holds the Progress activity chart to 250 ms. It took 600 ms, because it reads all 332,643 raw study events to draw 28 days, and bringing it under that limit is on my list below.</p></article>
     <article class="card pad"><h3>Fault injection</h3><p>A 48-day simulation runs with a fault added to the save step, which increments every review count. The test passes only if the simulation reports the failure. This confirms that the check detects a double count.</p></article>
-    <article class="card pad"><h3>Not yet in place</h3><p>Skopos does not have code coverage reporting or continuous integration on every push. The end-to-end specs are slow and run three at a time.</p></article>
+    <article class="card pad"><h3>Where the tests run</h3><p>I run the tests on my own machine. Before any merge, the merge script reruns the tests the branch changed on the merged tree. The end-to-end specs start the real Electron app and run three at a time.</p></article>
   </div>
 </section>
+
+<!-- 6. NEXT -->
+<section class="wrap block" id="next">
+  <h2>What I would build next</h2>
+  <ul class="plain">
+    <li><strong>Unit and component tests on GitHub after every push, with a coverage report.</strong> I have started this work. The end-to-end specs will stay on my machine, because they need the local source packs and a desktop session.</li>
+    <li><strong>A test that fails when a new network call is added.</strong> It would replace the reviewed text search, which finds only what its pattern matches.</li>
+    <li><strong>The main window in the Chromium sandbox.</strong> It already runs with context isolation on and Node integration off, and the two PDF helper windows already run sandboxed.</li>
+    <li><strong>The Progress activity chart within its 250 ms limit at 100,000 cards.</strong></li>
+    <li><strong>A record of my own runs of the app in the project plan, beside the receipts.</strong></li>
+  </ul>
+</section>
+
 
 <section class="wrap block contact">
   <p><a class="btn subtle" href="index.html">Back to the case study</a></p>
