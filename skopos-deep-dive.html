@@ -90,9 +90,9 @@ button.btn[disabled] { opacity: .45; cursor: default; }
 <main>
 
 <section class="hero wrap">
-  <p class="eyebrow">Skopos technical deep dive, figures as of 2026-11-09</p>
+  <p class="eyebrow">Skopos technical deep dive</p>
   <h1>How Skopos is built and tested</h1>
-  <p class="lede">Skopos is a free MCAT study app in development for Windows and Mac. AI coding agents wrote its code and its tests. I wrote the task contracts and the project rules, including the rule that every task needs a test that fails on bad work. This page covers five parts of the project: the harness that checks the agents, the question generator, the planner and FSRS scheduling, data protection, and the test suite. The figures come from my project handbook, which was checked against the code on 2026-11-09, and from the code and the project plan directly.</p>
+  <p class="lede">Skopos is a free MCAT study app in development for Windows and Mac. AI coding agents wrote its code and its tests. I wrote the task contracts and the project rules, including the rule that every task needs a test that fails on bad work. This page covers five parts of the project: the harness that checks the agents, the question generator, the planner and FSRS scheduling, data protection, and the test suite. The figures come from my project handbook, which was checked against the code, and from the code and the project plan directly.</p>
   <p class="note"><a href="index.html">Back to the case study</a></p>
 </section>
 
@@ -140,9 +140,9 @@ button.btn[disabled] { opacity: .45; cursor: default; }
   </div>
 
   <div class="grid two after">
-    <article class="card pad"><h3>Task contracts</h3><p>A script generates each contract from the project plan. There were about 175 contract files as of 2026-11-09. Each contract states why the task exists, what to do, the acceptance test, the files the agent may change, and the decisions that are outside its scope. If a fix needs a file outside the write scope, the agent stops and reports it.</p></article>
+    <article class="card pad"><h3>Task contracts</h3><p>A script generates each contract from the project plan. There are about 175 contract files. Each contract states why the task exists, what to do, the acceptance test, the files the agent may change, and the decisions that are outside its scope. If a fix needs a file outside the write scope, the agent stops and reports it.</p></article>
     <article class="card pad"><h3>Failing-first tests</h3><p>The acceptance test must fail on the old code before the change and pass after it. This shows the test detects the defect. Builders may not edit a failing behaviour test to make it pass. The one exception is a declared golden file rebuild, where the builder must list which values changed and why.</p></article>
-    <article class="card pad"><h3>Branches and worktrees</h3><p>Each task runs on a branch named <code>lane/</code> plus a task name, usually in its own Git worktree, so unfinished work in one task does not affect the tests of another. As of 2026-11-09 there were about 150 worktrees and about 200 lane branches on GitHub.</p></article>
+    <article class="card pad"><h3>Branches and worktrees</h3><p>Each task runs on a branch named <code>lane/</code> plus a task name, usually in its own Git worktree, so unfinished work in one task does not affect the tests of another. There are about 150 worktrees and about 200 lane branches on GitHub.</p></article>
     <article class="card pad"><h3>The blind verifier</h3><p>The verifier is a second AI agent. It reads only the diff, the receipt and the acceptance test, and never the reasoning of the builder. It reruns the commands, restores the old code to check that the test fails, checks that no test was weakened, and does not edit anything. A FAILS verdict must cite evidence, either a command that exits non-zero or a file and line. The reply is one line that starts with HOLDS or FAILS.</p></article>
     <article class="card pad"><h3>Receipts</h3><p>A receipt records the command, its exit code, the pass and fail counts, the Git commit and a SHA-256 hash of every file in scope. The check command rehashes the files and reruns the command. On 2026-10-05 an audit replaced the receipt script with a two-line script that always reported success, and a task was marked done. Since then, the hash of the receipt script is signed and stored inside the <code>.git</code> folder, and the plan script checks it before it accepts any verdict.</p></article>
     <article class="card pad"><h3>The done gate and the merge gate</h3><p><code>state.js done</code> rejects a task that has no receipt, no named verifier, or no one-line verdict starting with HOLDS. It then checks that the receipt is signed and still passes. The merge script reruns the unit tests the branch changed on the merged code, rebuilds the app when its source changed, and checks the receipt again. If the branch changed a test that was not run, the result is INCOMPLETE.</p></article>
@@ -150,7 +150,7 @@ button.btn[disabled] { opacity: .45; cursor: default; }
 
   <article class="card pad feature after">
     <h3>The command guard</h3>
-    <p>A script checks each shell command before an agent runs it. These are its responses on 2026-11-09, shortened:</p>
+    <p>A script checks each shell command before an agent runs it. These are its responses, shortened:</p>
     <pre class="code">"git add -A"           =&gt; refused: stage explicit paths
 "git push --force"     =&gt; refused: never force-push
 "npx playwright test"  =&gt; refused: use the repo script, which takes the app lock and rebuilds
@@ -158,7 +158,7 @@ button.btn[disabled] { opacity: .45; cursor: default; }
     <p>I also tested its limits the same day. Staging a whole folder by name is allowed. A banned command inside quotes is allowed, because the guard treats quoted text as data so that commit messages do not trigger it. Running Playwright by its file path is allowed. The guard prevents accidental mistakes. It does not stop an agent that deliberately works around it, so the receipts and the verifier remain the main checks.</p>
   </article>
 
-  <h3 class="gap">Defects the harness caught in the week of 2026-11-09</h3>
+  <h3 class="gap">Defects the harness caught</h3>
   <ul class="plain catches">
     <li><strong>A test file count was off by one.</strong> A handbook draft stated 1,391 files in <code>tests/unit</code> and 421 committed receipts. The verifier counted 1,392 and 422, because the commit for the draft had added a test file and a receipt after the count. Counts are now given as approximate, with the date.</li>
     <li><strong>A statement about the test clock was reversed.</strong> A draft stated that the test clock "runs a fixed amount behind" to reach Monday. The verifier cited <code>tests/e2e/helpers/pinnedClock.js:4</code>, which states that the clock moves ahead and never behind. The receipts for both drafts were green. The verifier found the error by reading the helper source.</li>
@@ -194,13 +194,13 @@ button.btn[disabled] { opacity: .45; cursor: default; }
 
   <div class="panels">
     <article class="card pad panel" id="st-plan"><h3>Plan<span class="kind">model</span></h3><p>One call plans a batch of blueprints. Each blueprint sets what the question asserts, the operation, the key claim, the steps, and three common misconceptions to use as wrong choices. Each blueprint is also assigned the letter for its key, rotating through A to D.</p><div class="eg"><p>The BB-R25 run log records one batch as "planned 6 · written 10 · lint-failed 1 · solver-verified 4 · grounded 4 · landed 4", so ten drafts produced four landed questions.</p></div></article>
-    <article class="card pad panel" id="st-write"><h3>Write<span class="kind">model</span></h3><p>One call per blueprint writes the question from a gold example and cites the span of the source that supports the answer. The writer does not write CARS passages. CARS passages are real excerpts, word for word, credited to their authors, and the writer receives the passage as fixed text and writes only the questions. Science passages are written from a real source. They may describe an invented experiment, but they may not state a fact the source does not support.</p><div class="eg"><p>CARS passages were changed to real excerpts after a blind rating on 2026-11-01, in which the rater identified all 12 model-written passages as purpose-written. As of 2026-11-07, every landed CARS passage comes from open-access humanities essays in the Open Library of Humanities and PubMed Central.</p></div></article>
+    <article class="card pad panel" id="st-write"><h3>Write<span class="kind">model</span></h3><p>One call per blueprint writes the question from a gold example and cites the span of the source that supports the answer. The writer does not write CARS passages. CARS passages are real excerpts, word for word, credited to their authors, and the writer receives the passage as fixed text and writes only the questions. Science passages are written from a real source. They may describe an invented experiment, but they may not state a fact the source does not support.</p><div class="eg"><p>CARS passages were changed to real excerpts after a blind rating on 2026-11-01, in which the rater identified all 12 model-written passages as purpose-written. Every landed CARS passage so far comes from open-access humanities essays in the Open Library of Humanities and PubMed Central.</p></div></article>
     <article class="card pad panel" id="st-lint"><h3>Lint and maths<span class="kind">code</span></h3><p>Code checks each draft for duplicate wrong choices, text the app cannot display, and numeric answers that do not match their formula. For a numeric key, the writer must supply the formula. A small parser evaluates it without <code>eval</code>, using a fixed list of functions and constants. The check rejects any number the question does not give, requires the key to match the computed value at its own significant figures and sign, and requires that no wrong choice also matches.</p><div class="eg"><p>This check was added because a paid judge model detected a wrong key on some runs and missed it on others. One key read "approximately 6.66 m/s" where the square root of 44.28 is 6.654. Another gave +8.82 J where the work is negative. On a test item, "6.65 m/s" failed as <code>key_computation_mismatch</code>, and a formula that used 3.1, a number the stem does not give, failed as <code>key_computation_foreign_number</code>.</p></div></article>
     <article class="card pad panel" id="st-solve"><h3>Solve<span class="kind">second model</span></h3><p>A different model answers the question with the source available. It checks for a second defensible answer, two choices that mean the same thing, or a stem that reveals the answer. In strict mode, a solver confidence below 0.75 drops the question.</p><div class="eg"><p>In the BB-R25 batch, 10 drafts were written, 1 failed the lint stage and 4 were verified by the solver. The other drafts did not continue.</p></div></article>
     <article class="card pad panel" id="st-lure"><h3>Lure<span class="kind">small model, measurement only</span></h3><p>A small model answers without the source, to estimate how a less prepared student would answer. The wrong choice it selects is recorded on the question. This stage does not reject questions, except in one catalogue path. Where its answer is used as a gate, it answers twice with the choices rotated, so that its preferred letter does not affect the result.</p></article>
     <article class="card pad panel" id="st-gates"><h3>Gates<span class="kind">code, then judge model</span></h3><p>Code runs a second set of checks, then a judge model scores the question against the item standard. A question that fails is dropped with its reason.</p><div class="eg"><p>The header comment of the gates file stated that the file was "called by nothing yet". The comment was out of date. The pipeline calls the file in two places.</p></div></article>
     <article class="card pad panel" id="st-ground"><h3>Grounding<span class="kind">code, then verifier model</span></h3><p>Code searches the source for the cited quote. An exact match passes. Otherwise, at least 80 percent of the words of the quote must appear within one window of the source of the same length. A verifier model then rates whether the line supports the answer. Only a full yes passes. If the source also supports a wrong choice, the question fails as <code>distractor_supported</code>. CARS questions may not rely on any fact outside the passage.</p><div class="eg"><p>For CARS, the content words of the key must match one passage sentence at a share of 0.9 or higher. The code records that a threshold of 0.8 failed one real AAMC question and 0.9 failed none, measured on 53 AAMC CARS items.</p></div></article>
-    <article class="card pad panel" id="st-land"><h3>Land<span class="kind">code</span></h3><p>The question is saved only at this stage, and its choices are then rotated by a random amount. The key and each "why wrong" note move with their own text. Numeric choices stay in ascending order, as on the exam. A question whose explanation still names the old letter, such as "The answer is C" after the key moved to A, is dropped as <code>letter_mismatch</code>.</p><div class="eg"><p>Across 2,109 landed questions counted on 2026-11-09, the key was A for 503 (23.9%), B for 573 (27.2%), C for 555 (26.3%) and D for 478 (22.7%).</p></div></article>
+    <article class="card pad panel" id="st-land"><h3>Land<span class="kind">code</span></h3><p>The question is saved only at this stage, and its choices are then rotated by a random amount. The key and each "why wrong" note move with their own text. Numeric choices stay in ascending order, as on the exam. A question whose explanation still names the old letter, such as "The answer is C" after the key moved to A, is dropped as <code>letter_mismatch</code>.</p><div class="eg"><p>In a count of 2,109 landed questions, the key was A for 503 (23.9%), B for 573 (27.2%), C for 555 (26.3%) and D for 478 (22.7%).</p></div></article>
   </div>
 
   <div class="grid two after">
@@ -240,7 +240,7 @@ button.btn[disabled] { opacity: .45; cursor: default; }
   <div class="grid three">
     <article class="card pad"><h3>Stability</h3><p>The number of days until the probability of recall falls to 90 percent. A higher value means a stronger memory.</p></article>
     <article class="card pad"><h3>Difficulty</h3><p>How hard the card is for this student, on a scale of 1 to 10.</p></article>
-    <article class="card pad"><h3>Retention target of 0.9</h3><p>The scheduler sets each interval so that the probability of recall on the due date is 90 percent. Skopos uses the ts-fsrs default, confirmed from the running engine on 2026-11-09. Interval fuzz is off, so the same review always produces the same date.</p></article>
+    <article class="card pad"><h3>Retention target of 0.9</h3><p>The scheduler sets each interval so that the probability of recall on the due date is 90 percent. Skopos uses the ts-fsrs default, confirmed from the running engine. Interval fuzz is off, so the same review always produces the same date.</p></article>
   </div>
 
   <article class="card pad after" id="fsrs-explorer">
@@ -301,7 +301,7 @@ button.btn[disabled] { opacity: .45; cursor: default; }
 
   <article class="card pad feature after">
     <h3>Network connections</h3>
-    <p>On 2026-11-09 the app code was searched for every network call, and each result was reviewed. The connections, in the order they occur:</p>
+    <p>The app code was searched for every network call, and each result was reviewed. The connections, in the order they occur:</p>
     <ol class="plain">
       <li>On every launch, two scripts load from public CDNs, JSZip and MathJax. The app does not use them. This is an open finding.</li>
       <li>Sixty seconds after start, in packaged builds only, the update check asks GitHub Releases for a newer version.</li>
@@ -315,8 +315,8 @@ button.btn[disabled] { opacity: .45; cursor: default; }
   </article>
 
   <div class="grid three after">
-    <article class="card pad"><h3>Fix: plain copies removed after migration</h3><p>After the move into the vault, the old plain <code>Skopos_Data.json</code> and up to five plain <code>.bak</code> copies remained beside the encrypted file. Since VAULT-LEGACY was merged on 2026-11-09, they are deleted once the vault opens and verifies, and never in safe mode. This is the task shown in the example above.</p></article>
-    <article class="card pad"><h3>Fix: crash-safe save</h3><p>When Windows refused a rename, one save path deleted the old file before it renamed the new one, so a crash at that point left no data file. Since SAVE-GAP was merged on 2026-11-09, the old file is moved aside and kept, the next boot can load it, and the aside copy is removed after the next successful save.</p></article>
+    <article class="card pad"><h3>Fix: plain copies removed after migration</h3><p>After the move into the vault, the old plain <code>Skopos_Data.json</code> and up to five plain <code>.bak</code> copies remained beside the encrypted file. Since VAULT-LEGACY was merged, they are deleted once the vault opens and verifies, and never in safe mode. This is the task shown in the example above.</p></article>
+    <article class="card pad"><h3>Fix: crash-safe save</h3><p>When Windows refused a rename, one save path deleted the old file before it renamed the new one, so a crash at that point left no data file. Since SAVE-GAP was merged, the old file is moved aside and kept, the next boot can load it, and the aside copy is removed after the next successful save.</p></article>
     <article class="card pad"><h3>Fix: locked-vault recovery screen</h3><p>When the key file was lost but the vault remained, the app showed an empty main area with no message. Now a vault that cannot be opened is never deleted or replaced. The student sees a recovery screen titled "Your study data is locked", worded as I approved it, with two buttons, "Restore a backup" and "Copy details".</p></article>
   </div>
   <p class="note">Open item: the main window runs with context isolation on and Node integration off, but with the sandbox off. The two PDF helper windows run sandboxed.</p>
@@ -325,11 +325,11 @@ button.btn[disabled] { opacity: .45; cursor: default; }
 <!-- 5. TESTING -->
 <section class="wrap block" id="testing">
   <h2>5. The test suite</h2>
-  <p class="sub">Approximate file counts as of 2026-11-09, taken with <code>find</code>. Each file contains several test cases.</p>
+  <p class="sub">Approximate file counts, taken with <code>find</code>. Each file contains several test cases.</p>
   <ul class="facts" aria-label="Test counts">
     <li><strong>About 1,400</strong><span>Node test files in tests/unit and tests/integration</span></li>
     <li><strong>About 350</strong><span>React component test files, run by Vitest</span></li>
-    <li><strong>228</strong><span>Playwright specs that start the real Electron app</span></li>
+    <li><strong>Over 200</strong><span>Playwright specs that start the real Electron app</span></li>
     <li><strong>14</strong><span>golden masters, compared to 10 decimal places</span></li>
   </ul>
   <div class="grid three after">
