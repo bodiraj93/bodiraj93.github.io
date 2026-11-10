@@ -325,15 +325,15 @@ button.btn[disabled] { opacity: .45; cursor: default; }
 <!-- 5. TESTING -->
 <section class="wrap block" id="testing">
   <h2>5. The test suite</h2>
-  <p class="sub">Approximate file counts, taken with <code>find</code>. Each file contains several test cases.</p>
-  <ul class="facts" aria-label="Test counts">
-    <li><strong>About 1,400</strong><span>Node test files in tests/unit and tests/integration</span></li>
-    <li><strong>About 350</strong><span>React component test files, run by Vitest</span></li>
-    <li><strong>Over 200</strong><span>Playwright specs that start the real Electron app</span></li>
-    <li><strong>14</strong><span>golden masters, compared to 10 decimal places</span></li>
+  <p class="intro">Skopos has nearly 2,000 automated test files. About 1,400 are Node unit and integration test files, about 350 are React component test files, and over 200 are end-to-end specs. Each file contains several test cases.</p>
+  <ul class="facts" aria-label="Test files">
+    <li><strong>Nearly 2,000</strong><span>automated test files in total</span></li>
+    <li><strong>About 1,400</strong><span>of them are Node unit and integration test files</span></li>
+    <li><strong>About 350</strong><span>of them are React component test files, run by Vitest</span></li>
+    <li><strong>Over 200</strong><span>of them are Playwright end-to-end specs that start the real Electron app</span></li>
   </ul>
   <div class="grid three after">
-    <article class="card pad"><h3>Golden masters</h3><p>The golden masters store the full output of the planning and scheduling calculations for fixed inputs. One test changes a copy by 0.000000001 and confirms that the comparison detects it. A master is rebuilt only when the calculation is changed on purpose, never to clear a failure.</p></article>
+    <article class="card pad"><h3>Golden masters</h3><p>The 14 golden masters store the full output of the planning and scheduling calculations for fixed inputs. One test changes a copy by 0.000000001 and confirms that the comparison detects it. Values are compared to 10 decimal places. A master is rebuilt only when the calculation is changed on purpose, never to clear a failure.</p></article>
     <article class="card pad"><h3>Six-month simulation</h3><p>A simulated student studies for 180 days through the real save path and a real encrypted database. The schedule includes Sundays off, a holiday, a three-week gap, a 400-review catch-up day and 16 scripted fault events. The run with seed 1 finished in 2 minutes 12 seconds with zero failures and six practice exams.</p></article>
     <article class="card pad"><h3>Three-year simulation</h3><p>A second simulated student uses the app for 1,095 days, then exports the data and resets the app. In one run, 23 of 23 checks passed and a 4.8 MB export was read back byte for byte with zero records lost. This run saves weekly instead of daily, which keeps it to five minutes.</p></article>
     <article class="card pad"><h3>Scale test with 100,000 cards</h3><p>A scale run loads 100,000 cards and 4,000 questions into a 49.7 MB vault. The due scan took 41 ms, and the deck page renders at most 49 rows at any deck size. One finding is open. The Progress activity chart took 600 ms against a 250 ms limit, because it reads all 332,643 raw study events.</p></article>
