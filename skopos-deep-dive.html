@@ -75,7 +75,7 @@
 "durationMs": 9228,
 "git": { "branch": "lane/vault-legacy", ... },
 "scopeFiles": { "src/main/storageAdapter.js": "3e05f37d145a939a...", ... }</pre><p>The receipt stores the exit code, the commit and a SHA-256 hash of each file in scope. If any of those files changes later, the receipt no longer confirms. The verifier recorded the receipt as confirmed, with 60 tests passing.</p></li>
-      <li id="walk-11"><span class="tag">Merge</span><h3>The branch was merged into the trunk</h3><p>Merge commit <code>27c4773eb</code> brought the branch into <code>flow-build</code>. After the merge, the vault test and the save test ran together with 8 tests, 8 passed and 0 failed.</p></li>
+      <li id="walk-11"><span class="tag">Merge</span><h3>The branch was merged into the trunk</h3><p>Merge commit <code>27c4773eb</code> brought the branch into <code>flow-build</code>. The vault test then stayed in use as a regression check. The receipt for the next vault task, KEY-LOST, ran it together with the locked-vault test, and 8 of 8 tests passed.</p></li>
     </ol>
   </div>
 
