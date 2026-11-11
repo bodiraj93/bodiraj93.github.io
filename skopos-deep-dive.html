@@ -244,7 +244,7 @@
 
   <article class="card pad feature after">
     <h3>Network connections</h3>
-    <p>Skopos is built to work offline, so every connection it makes has a stated reason. The app loads no script from the internet. Math is typeset by KaTeX from the app's own files, and a unit test fails if <code>index.html</code> gains a script from a web address. The app code was searched for every network call, and each result was reviewed. These are the connections, in the order they occur.</p>
+    <p>Skopos is built to work offline, so every connection it makes has a stated reason. The app does not load scripts from the internet. Math is typeset by KaTeX from the app's own files, and a unit test fails if <code>index.html</code> gains a script from a web address. The app code was searched for every network call, and each result was reviewed. These are the connections, in the order they occur.</p>
     <ol class="plain">
       <li>Sixty seconds after start, in packaged builds only, the update check asks GitHub Releases for a newer version.</li>
       <li>When a student saves an AI key, the app asks that provider (Google, OpenAI, Anthropic or Groq) for the list of models the key can use, so that it uses the newest model the key offers. With no key saved, no call is made.</li>
