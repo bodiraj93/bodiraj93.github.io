@@ -231,7 +231,7 @@
   <p class="intro">Because a student's study history is personal, I decided Skopos does not use an account or a server, and that study data stays on the student's own computer. It is stored in one SQLCipher database. SQLCipher is a version of SQLite that encrypts the whole database file.</p>
   <div class="grid three">
     <article class="card pad"><h3>Key storage</h3><p>A random 32-byte key is generated on first run and stored through Electron safeStorage, which uses the protected storage of the operating system. If that storage is unavailable, the key manager refuses to run. There is no plain-text fallback, because a key saved in plain text beside the database would undo the encryption. AI provider keys and the phone pairing secret are stored the same way.</p></article>
-    <article class="card pad"><h3>How encryption is tested</h3><p>A plain SQLite file always begins with the bytes <code>SQLite format 3</code>. An end-to-end test starts the real app and fails if the database file begins with them. When a vault created by the test simulation is opened with the plain SQLite library and no key, the library returns "file is not a database".</p></article>
+    <article class="card pad"><h3>How encryption is tested</h3><p>A plain SQLite file always begins with the bytes <code>SQLite format 3</code>. An end-to-end test starts the real app and fails if the database file begins with them. When a vault created by the test simulation is opened with the plain SQLite library without a key, the library returns "file is not a database".</p></article>
     <article class="card pad"><h3>When the vault cannot open</h3><p>A boot guard restores the last good copy, opens the app in safe mode and tells the student. In safe mode the app keeps working from a local JSON copy, so a student never loses a session. The next healthy start moves the data back into the encrypted vault.</p></article>
   </div>
 
@@ -247,7 +247,7 @@
     <p>Skopos is built to work offline, so every connection it makes has a stated reason. The app does not load scripts from the internet. Math is typeset by KaTeX from the app's own files, and a unit test fails if <code>index.html</code> gains a script from a web address. The app code was searched for every network call, and each result was reviewed. These are the connections, in the order they occur.</p>
     <ol class="plain">
       <li>Sixty seconds after start, in packaged builds only, the update check asks GitHub Releases for a newer version.</li>
-      <li>When a student saves an AI key, the app asks that provider (Google, OpenAI, Anthropic or Groq) for the list of models the key can use, so that it uses the newest model the key offers. With no key saved, no call is made.</li>
+      <li>When a student saves an AI key, the app asks that provider (Google, OpenAI, Anthropic or Groq) for the list of models the key can use, so that it uses the newest model the key offers. If a key is not saved, the app does not make the call.</li>
       <li>When the student generates questions with that key, the prompt is sent to the chosen provider and can include study text.</li>
       <li>When a phone is paired, messages pass through a relay. They are encrypted with AES-256-GCM before they leave, using keys derived from a secret that is shared only through the QR code. The relay cannot decrypt them.</li>
       <li>Only web links are opened, and they open in the system browser.</li>
