@@ -40,7 +40,7 @@
 <section class="hero wrap">
   <p class="eyebrow">March 2026 to now</p>
   <h1>Skopos is a free MCAT study app that I built and lead</h1>
-  <p class="lede">It began as a personal flashcard tool and has grown into a complete study platform: a daily plan built around the exam date, questions in the AAMC format with detailed explanations, and spaced-repetition flashcards. I lead the product and test every release. AI coding agents write the code inside a zero-trust test harness I designed, and nothing ships until it passes.</p>
+  <p class="lede">It began as a personal flashcard tool and has grown into a complete study platform: a daily plan built around the exam date, questions in the AAMC format with detailed explanations, and spaced-repetition flashcards. I lead the product and test every release. AI coding agents write the code inside a zero-trust test harness I designed, and a change does not ship until it passes.</p>
 
   <figure class="video card">
     <video controls preload="metadata" playsinline poster="poster.webp" width="1920" height="1080">
@@ -188,7 +188,7 @@
     <li><h3>The student's choices</h3><p>A model the student has pinned is used as is. Otherwise the router stays within their chosen provider, their quality setting and their spending limit.</p></li>
     <li><h3>What the task needs</h3><p>Each task declares what it requires, such as reading images, reading PDFs, structured output, long documents or keeping data on the computer. Models that cannot do the job are filtered out.</p></li>
     <li><h3>Best fit, then cost</h3><p>Among the models left, it scores quality for that kind of work and moves up a tier only for harder material, such as difficult questions or answers that must be graded precisely.</p></li>
-    <li><h3>A plain message when no model fits</h3><p>If none of the available models meets every requirement, it uses the closest match and tells the student plainly, including what would fix it. It does not fail silently.</p></li>
+    <li><h3>A plain message when not one model fits</h3><p>If not one of the available models meets every requirement, it uses the closest match and tells the student plainly, including what would fix it. It does not fail silently.</p></li>
   </ol>
   <p class="note">The routing decision is a pure function: the same inputs always give the same answer, without side effects, so every rule can be tested directly. Adding a new provider means registering it, not changing the router.</p>
   <div class="grid two after">
@@ -265,9 +265,9 @@
   <h2>My role</h2>
   <div class="card pad role">
     <p>I lead the product, which means I define the requirements and quality standards, design the interface, and test every release. My biochemistry degree lets me verify the science content directly.</p>
-    <p>I treat AI coding agents as capable but untrusted. They write fast, and they can also hallucinate, so nothing they produce is believed until a test proves it.</p>
+    <p>I treat AI coding agents as capable but untrusted. They write fast, and they can also hallucinate, so their work is not trusted until a test proves it.</p>
     <p>In early 2026, I ran ten agent sessions in parallel, on my desktop and on a linked laptop once the desktop's 32 GB of RAM ran out. They showed that throughput was not the bottleneck. The agents fell into retry loops on the same failure, without root-cause analysis, because they did not have a model of the system's architecture. I paused feature work and spent several months building the harness. It has deterministic gates on every change, working rules in a CLAUDE.md file that each agent loads at start, and all state kept in the repository rather than in any session. The plan, the decisions and the handoffs move between Claude and Codex accounts without loss. Feature work has run smoothly since.</p>
-    <p>Every task starts as a written contract, with a test designed to fail on bad work. The agents, Claude Code and OpenAI Codex, write code in isolated branches, and a second agent, blind to the first, tries to break the result. Nothing merges until the Node unit tests and the end-to-end tests pass again and leave a record that they ran. At the key gates, I run the app myself and sign off.</p>
+    <p>Every task starts as a written contract, with a test designed to fail on bad work. The agents, Claude Code and OpenAI Codex, write code in isolated branches, and a second agent, blind to the first, tries to break the result. A change does not merge until the Node unit tests and the end-to-end tests pass again and leave a record that they ran. At the key gates, I run the app myself and sign off.</p>
   </div>
 </section>
 
